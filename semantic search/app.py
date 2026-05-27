@@ -15,6 +15,7 @@ import pickle
 import json
 from fastembed import TextEmbedding
 from datetime import datetime
+import threading
 
 app = Flask(__name__)
 CORS(app)
@@ -407,8 +408,10 @@ def rebuild_indexes():
         'projects_indexed': len(projects_metadata)
     })
 
-print("Initializing indexes...")
-initialize_indexes()
+print("Starting background index initialization...")
+# Run index initialization in a background thread so Gunicorn can bind to the port immediately
+init_thread = threading.Thread(target=initialize_indexes, daemon=True)
+init_thread.start()
 
 if __name__ == '__main__':
     print("Starting Flask server...")
