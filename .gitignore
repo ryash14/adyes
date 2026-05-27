@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python / Semantic Search
+semantic search/model_cache/
+semantic search/firebase-key.json
+semantic search/__pycache__/
+semantic search/faiss_indexes/
+
+
+.env
+.cursor/
+.kiro/
+
+
+# Testing and extra files
+*.html
+!index.html
+!semantic search/templates/index.html
+cors.json
+fix_cors.py
+users.json
+design-system/
+*.md
+!README.md
+
