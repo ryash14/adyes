@@ -342,13 +342,19 @@ class ContentService {
    */
   async deleteIdea(ideaId) {
     try {
-      const ideaRef = doc(db, 'ideas', ideaId);
-      await deleteDoc(ideaRef);
       try {
         await semanticSearchService.deleteContent('ideas', ideaId);
       } catch (err) {
         console.warn('Failed to delete idea from semantic search API:', err);
       }
+      
+      try {
+        const ideaRef = doc(db, 'ideas', ideaId);
+        await deleteDoc(ideaRef);
+      } catch (err) {
+        console.warn('Client-side Firebase delete ignored (likely handled by backend):', err);
+      }
+      
       return { error: null };
     } catch (error) {
       console.error('Error deleting idea:', error);
@@ -361,13 +367,19 @@ class ContentService {
    */
   async deleteProject(projectId) {
     try {
-      const projectRef = doc(db, 'projects', projectId);
-      await deleteDoc(projectRef);
       try {
         await semanticSearchService.deleteContent('projects', projectId);
       } catch (err) {
         console.warn('Failed to delete project from semantic search API:', err);
       }
+      
+      try {
+        const projectRef = doc(db, 'projects', projectId);
+        await deleteDoc(projectRef);
+      } catch (err) {
+        console.warn('Client-side Firebase delete ignored (likely handled by backend):', err);
+      }
+      
       return { error: null };
     } catch (error) {
       console.error('Error deleting project:', error);

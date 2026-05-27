@@ -42,7 +42,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    if (item) {
+    if (item && item.userId) {
       if (user && user.uid !== item.userId) {
         connectionService.getConnection(user.uid, item.userId).then((res) => {
           if (res.data) {

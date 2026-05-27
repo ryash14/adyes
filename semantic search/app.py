@@ -179,13 +179,15 @@ def search_index(collection_type, query, top_k=10):
     # Return latest items if query is empty
     if not query or not query.strip():
         # metadata is appended chronologically (oldest to newest), so we take the last k
-        latest_metadata = metadata[-k:]
-        # Reverse to get newest first
         results = []
-        for meta in reversed(latest_metadata):
+        for meta in reversed(metadata):
+            if meta.get('deleted'):
+                continue
             result = meta.copy()
             result['similarity_score'] = 1.0
             results.append(result)
+            if len(results) >= k:
+                break
         return results
     
     # Create query embedding
@@ -200,6 +202,8 @@ def search_index(collection_type, query, top_k=10):
     for idx, distance in zip(indices[0], distances[0]):
         if idx < len(metadata):
             result = metadata[idx].copy()
+            if result.get('deleted'):
+                continue
             result['similarity_score'] = float(1 / (1 + distance))  # Convert distance to similarity
             results.append(result)
     
@@ -290,6 +294,43 @@ def submit():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/delete', methods=['POST', 'OPTIONS'])
+def delete_item():
+    """Soft delete an item from the index and Firebase"""
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+        return response, 200
+
+    data = request.json
+    doc_id = data.get('id')
+    collection_type = data.get('type')
+    
+    if not doc_id or not collection_type:
+        return jsonify({'error': 'id and type required'}), 400
+        
+    global ideas_metadata, projects_metadata
+    metadata = ideas_metadata if collection_type == 'ideas' else projects_metadata
+        
+    for meta in metadata:
+        if meta.get('id') == doc_id:
+            meta['deleted'] = True
+            save_indexes()
+            
+            # Delete from Firebase if enabled
+            if FIREBASE_ENABLED:
+                try:
+                    db.collection(collection_type).document(doc_id).delete()
+                except Exception as e:
+                    print("Firebase delete error:", e)
+                    
+            return jsonify({'success': True})
+            
+    return jsonify({'error': 'Not found'}), 404
 
 
 @app.route('/api/stats', methods=['GET'])

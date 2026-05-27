@@ -16,6 +16,7 @@ import ContentModal from '../components/ContentModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { formatRole } from '../utils/display';
 import { Button } from '@/components/ui/Button';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
   const { userId } = useParams();
