@@ -1,6 +1,6 @@
 flask
 flask-cors
-requests
+fastembed
 firebase-admin
 faiss-cpu
 numpy

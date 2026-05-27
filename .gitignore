@@ -45,3 +45,4 @@ design-system/
 *.md
 !README.md
 
+semantic search/model_cache/
