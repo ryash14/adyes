@@ -100,6 +100,11 @@ export default function Discover() {
     if (activeTab === 'ideas') setCurrentIdeaPage(0);
     else setCurrentProjectPage(0);
 
+    if (!searchQuery.trim()) {
+      setSemanticResults(null);
+      return;
+    }
+
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
@@ -109,7 +114,7 @@ export default function Discover() {
           body: JSON.stringify({
             query: searchQuery,
             type: activeTab,
-            top_k: searchQuery.trim() ? 20 : 100 // Fetch 100 for normal browsing, 20 for search
+            top_k: 20
           })
         });
         if (response.ok) {

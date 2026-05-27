@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { storageService } from '../services/storage.service';
 import { Upload, X, Save, AlertCircle, FileText } from 'lucide-react';
@@ -19,6 +19,9 @@ export default function Settings() {
   const [photoUploadProgress, setPhotoUploadProgress] = useState(0);
   const [resumeUploadProgress, setResumeUploadProgress] = useState(0);
   const [skillInput, setSkillInput] = useState('');
+  const [showSkillDropdown, setShowSkillDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const inputRef = useRef(null);
   const [photoFile, setPhotoFile] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
   const [error, setError] = useState('');
