@@ -64,10 +64,31 @@ export default function Settings() {
   ), [photoFile]);
 
   useEffect(() => {
-    return () => {
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-    };
+    if (photoPreview && typeof photoPreview === 'string' && photoPreview.startsWith('blob:')) {
+      return () => URL.revokeObjectURL(photoPreview);
+    }
   }, [photoPreview]);
+
+  const PREDEFINED_SKILLS = [
+    "React", "Node.js", "Python", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS",
+    "UI/UX Design", "Figma", "Firebase", "Supabase", "MongoDB", "PostgreSQL",
+    "GraphQL", "Docker", "AWS", "Machine Learning", "Data Science", "Go", "Rust",
+    "C++", "Java", "Spring Boot", "DevOps", "Marketing", "Product Management",
+    "SEO", "Copywriting", "Sales", "Angular", "Vue.js", "Svelte", "React Native", "Flutter",
+    "iOS", "Android", "Solidity", "Web3", "Blockchain", "Smart Contracts",
+    "C#", ".NET", "PHP", "Laravel", "Ruby", "Ruby on Rails", "Django", "Flask",
+    "FastAPI", "Express.js", "NestJS", "Vuex", "Redux", "Zustand", "Apollo",
+    "Redis", "Elasticsearch", "Cassandra", "MySQL", "SQLite",
+    "Kubernetes", "Terraform", "Ansible", "Jenkins", "GitHub Actions",
+    "Azure", "Google Cloud", "DigitalOcean", "Vercel", "Netlify", "Heroku",
+    "Framer", "Adobe XD", "Sketch", "InVision", "Photoshop", "Illustrator",
+    "3D Modeling", "Blender", "Unity", "Unreal Engine", "Game Development",
+    "Cybersecurity", "Penetration Testing", "Cryptography", "Ethical Hacking",
+    "Computer Vision", "NLP", "Deep Learning", "TensorFlow", "PyTorch",
+    "Data Engineering", "Big Data", "Spark", "Hadoop", "Kafka",
+    "Business Development", "Growth Hacking", "Social Media Marketing", "Content Creation",
+    "Video Editing", "Premiere Pro", "After Effects", "Final Cut Pro"
+  ];
 
   const filteredSkills = PREDEFINED_SKILLS.filter(s => 
     s.toLowerCase().includes(skillInput.toLowerCase()) && 

@@ -127,7 +127,7 @@ export default function Discover() {
           const merged = data.results.map(r => ({...r, ...(realMap[r.id] || {})}));
           setSemanticResults(merged);
         } else {
-          setSemanticResults([]);
+          setSemanticResults(null);
         }
       } catch (err) {
         console.warn('Semantic search failed, falling back to local filter:', err);
