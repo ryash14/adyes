@@ -13,7 +13,8 @@ import numpy as np
 import faiss
 import pickle
 import json
-from sentence_transformers import SentenceTransformer
+import requests
+import time
 from datetime import datetime
 
 app = Flask(__name__)
@@ -42,16 +43,10 @@ except Exception as e:
     db = None
 
 
-# Initialize embedding model
-print("Loading embedding model...")
-model_cache_path = os.path.join(os.path.dirname(__file__), 'model_cache')
-os.makedirs(model_cache_path, exist_ok=True)
-
-import torch
-torch.set_num_threads(1)
-
-model = SentenceTransformer('all-MiniLM-L6-v2', cache_folder=model_cache_path, device='cpu')  # Lightweight model on CPU
-print("Model loaded successfully!")
+# HuggingFace API settings
+HF_API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+HF_TOKEN = os.environ.get("HF_TOKEN", "") # Optional but recommended for heavy usage
+print("Using HuggingFace Inference API for embeddings (0MB RAM!)")
 
 # FAISS indexes
 ideas_index = None
@@ -69,8 +64,30 @@ PROJECTS_META_PATH = os.path.join(FAISS_DIR, 'projects_metadata.pkl')
 
 
 def create_embedding(text):
-    """Create embedding for given text"""
-    return model.encode([text])[0]
+    """Create embedding using HuggingFace Inference API to save memory"""
+    headers = {}
+    if HF_TOKEN:
+        headers["Authorization"] = f"Bearer {HF_TOKEN}"
+    
+    # Try up to 3 times in case the free API is warming up (returns 503)
+    for attempt in range(3):
+        try:
+            response = requests.post(HF_API_URL, headers=headers, json={"inputs": [text]})
+            if response.status_code == 200:
+                return np.array(response.json()[0], dtype='float32')
+            elif response.status_code == 503:
+                # Model is loading on HF servers
+                time.sleep(2)
+            else:
+                print(f"HF API Error: {response.status_code} - {response.text}")
+                break
+        except Exception as e:
+            print(f"Embedding error: {e}")
+            break
+            
+    # Fallback if API completely fails (prevents crashes)
+    print("Warning: Returning empty embedding due to API failure")
+    return np.zeros(384, dtype='float32')
 
 
 def initialize_indexes():
@@ -334,6 +351,7 @@ def rebuild_indexes():
                 print(f"[IDEAS] Indexing {i+1}/{len(ideas_docs)} -> {doc.id}")
 
                 add_to_index('ideas', doc.id, data)
+                time.sleep(0.2) # Be nice to HF API limits
 
             except Exception as e:
                 print(f"Failed indexing idea {doc.id}: {e}")
@@ -354,6 +372,7 @@ def rebuild_indexes():
                 print(f"[PROJECTS] Indexing {i+1}/{len(projects_docs)} -> {doc.id}")
 
                 add_to_index('projects', doc.id, data)
+                time.sleep(0.2) # Be nice to HF API limits
 
             except Exception as e:
                 print(f"Failed indexing project {doc.id}: {e}")

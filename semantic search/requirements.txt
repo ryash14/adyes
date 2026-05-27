@@ -1,6 +1,6 @@
 flask
 flask-cors
-sentence-transformers
+requests
 firebase-admin
 faiss-cpu
 numpy
