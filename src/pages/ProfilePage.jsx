@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { userService } from '../services/user.service';
 import { contentService } from '../services/content.service';
 import { connectionService } from '../services/connection.service';
-import { UserPlus, MessageSquare, Edit3, Briefcase, GraduationCap, MapPin, Lightbulb, Rocket, Plus, Globe, FileText } from 'lucide-react';
+import { UserPlus, MessageSquare, Edit3, Trash2, Briefcase, GraduationCap, MapPin, Lightbulb, Rocket, Plus, Globe, FileText } from 'lucide-react';
 import { GitHubLogoIcon, LinkedInLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
 import AppShell from '../components/layout/AppShell';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -13,6 +13,7 @@ import Badge from '../components/ui/Badge';
 import LoadingState from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import ContentModal from '../components/ContentModal';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { formatRole } from '../utils/display';
 import { Button } from '@/components/ui/Button';
 
@@ -27,6 +28,8 @@ export default function ProfilePage() {
   const [connectionStatus, setConnectionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalConfig, setModalConfig] = useState({ open: false, type: 'idea', item: null });
+  const [deleteModalConfig, setDeleteModalConfig] = useState({ open: false, type: '', item: null });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isOwnProfile = user?.uid === userId;
 
@@ -74,6 +77,29 @@ export default function ProfilePage() {
 
   const openModal = (type, item = null) => {
     setModalConfig({ open: true, type, item });
+  };
+
+  const handleDeleteConfirm = async () => {
+    const { type, item } = deleteModalConfig;
+    if (!item) return;
+
+    setIsDeleting(true);
+    try {
+      const deleteFn = type === 'idea' ? contentService.deleteIdea.bind(contentService) : contentService.deleteProject.bind(contentService);
+      const res = await deleteFn(item.id);
+      
+      if (!res.error) {
+        toast.success('Successfully deleted!');
+        setDeleteModalConfig({ open: false, type: '', item: null });
+        loadProfile();
+      } else {
+        toast.error(res.error || 'Failed to delete');
+      }
+    } catch (err) {
+      toast.error('An error occurred during deletion');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (loading) {
@@ -235,13 +261,22 @@ export default function ProfilePage() {
                       <div className="flex items-start justify-between gap-4">
                         <h4 className="text-xl font-bold tracking-tight text-foreground">{idea.title}</h4>
                         {isOwnProfile && (
-                          <button 
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-white/5 text-muted-foreground hover:text-accent hover:bg-white/10 rounded-xl shrink-0 border border-white/10" 
-                            title="Edit idea"
-                            onClick={() => openModal('idea', idea)}
-                          >
-                            <Edit3 size={16} />
-                          </button>
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              className="p-2 bg-white/5 text-muted-foreground hover:text-accent hover:bg-white/10 rounded-xl shrink-0 border border-white/10" 
+                              title="Edit idea"
+                              onClick={() => openModal('idea', idea)}
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button 
+                              className="p-2 bg-white/5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl shrink-0 border border-white/10" 
+                              title="Delete idea"
+                              onClick={() => setDeleteModalConfig({ open: true, type: 'idea', item: idea })}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         )}
                       </div>
                       <p className="text-sm font-medium text-muted-foreground leading-relaxed">{idea.description}</p>
@@ -285,13 +320,22 @@ export default function ProfilePage() {
                       <div className="flex items-start justify-between gap-4">
                         <h4 className="text-xl font-bold tracking-tight text-foreground">{project.title}</h4>
                         {isOwnProfile && (
-                          <button 
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-white/5 text-muted-foreground hover:text-accent hover:bg-white/10 rounded-xl shrink-0 border border-white/10" 
-                            title="Edit project"
-                            onClick={() => openModal('project', project)}
-                          >
-                            <Edit3 size={16} />
-                          </button>
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              className="p-2 bg-white/5 text-muted-foreground hover:text-accent hover:bg-white/10 rounded-xl shrink-0 border border-white/10" 
+                              title="Edit project"
+                              onClick={() => openModal('project', project)}
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button 
+                              className="p-2 bg-white/5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl shrink-0 border border-white/10" 
+                              title="Delete project"
+                              onClick={() => setDeleteModalConfig({ open: true, type: 'project', item: project })}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         )}
                       </div>
                       <p className="text-sm font-medium text-muted-foreground leading-relaxed">{project.description}</p>
@@ -344,6 +388,17 @@ export default function ProfilePage() {
             item={modalConfig.item}
             userId={profile?.id}
             onSaved={loadProfile}
+          />
+        )}
+
+        {deleteModalConfig.open && (
+          <DeleteConfirmationModal
+            open={deleteModalConfig.open}
+            onClose={() => setDeleteModalConfig({ ...deleteModalConfig, open: false })}
+            onConfirm={handleDeleteConfirm}
+            itemName={deleteModalConfig.item?.title}
+            type={deleteModalConfig.type}
+            isDeleting={isDeleting}
           />
         )}
       </div>

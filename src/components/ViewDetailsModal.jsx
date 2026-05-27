@@ -9,6 +9,7 @@ import { contentService } from '../services/content.service';
 import { connectionService } from '../services/connection.service';
 import toast from 'react-hot-toast';
 import { cn } from '../utils/cn';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 export default function ViewDetailsModal({ open, onClose, item, type }) {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
   const [connectNote, setConnectNote] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -77,12 +79,12 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
     if (!user || !item || user.uid !== item.userId || isDeleting) return;
-    
-    if (!window.confirm(`Are you sure you want to delete this ${isIdea ? 'idea' : 'project'}?`)) {
-      return;
-    }
     
     setIsDeleting(true);
     try {
@@ -91,8 +93,8 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
       
       if (!res.error) {
         toast.success('Successfully deleted!');
+        setShowDeleteConfirm(false);
         onClose();
-        // Option to reload the page to refresh the items
         window.location.reload();
       } else {
         toast.error(res.error || 'Failed to delete');
@@ -108,7 +110,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
     <div className="flex justify-between items-center w-full">
       <div>
         {user && item && user.uid === item.userId && (
-          <button onClick={handleDelete} className="btn border border-destructive text-destructive hover:bg-destructive/10 h-10 px-4 rounded-xl" disabled={isDeleting}>
+          <button onClick={handleDeleteClick} className="btn border border-destructive text-destructive hover:bg-destructive/10 h-10 px-4 rounded-xl" disabled={isDeleting}>
             {isDeleting ? 'Deleting...' : 'Delete'}
           </button>
         )}
@@ -225,6 +227,17 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
           </div>
         )}
       </div>
+
+      {showDeleteConfirm && (
+        <DeleteConfirmationModal
+          open={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleConfirmDelete}
+          itemName={item.title}
+          type={isIdea ? 'idea' : 'project'}
+          isDeleting={isDeleting}
+        />
+      )}
     </Modal>
   );
 }
