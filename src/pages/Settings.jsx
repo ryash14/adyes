@@ -69,14 +69,38 @@ export default function Settings() {
     };
   }, [photoPreview]);
 
+  const filteredSkills = PREDEFINED_SKILLS.filter(s => 
+    s.toLowerCase().includes(skillInput.toLowerCase()) && 
+    !formData.skills.includes(s)
+  );
+
   const handleSkillKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
+    if (!showSkillDropdown) return;
+
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      const skill = skillInput.trim();
-      if (skill && !formData.skills.includes(skill) && formData.skills.length < 15) {
-        setFormData({ ...formData, skills: [...formData.skills, skill] });
+      setHighlightedIndex(prev => Math.min(prev + 1, filteredSkills.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredSkills.length > 0) {
+        addSkill(filteredSkills[highlightedIndex] || filteredSkills[0]);
+      } else if (skillInput.trim()) {
+        addSkill(skillInput.trim());
       }
+    } else if (e.key === 'Escape') {
+      setShowSkillDropdown(false);
+    }
+  };
+
+  const addSkill = (skill) => {
+    if (!formData.skills.includes(skill) && formData.skills.length < 10) {
+      setFormData({ ...formData, skills: [...formData.skills, skill] });
       setSkillInput('');
+      setShowSkillDropdown(false);
+      setHighlightedIndex(0);
     }
   };
 
@@ -361,27 +385,78 @@ export default function Settings() {
               <p className="text-xs text-muted-foreground text-right">{formData.bio.length} characters</p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <label className="text-xs font-semibold text-muted-foreground ml-1">Skills</label>
               <p className="text-xs text-muted-foreground/80 mb-2 ml-1">Add tags for languages, frameworks, or domains you excel in. Press Enter to add.</p>
-              <div className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-xl border border-white/10 bg-white dark:bg-zinc-900/40 backdrop-blur-md focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-sm">
+              <div 
+                className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-xl border border-white/10 bg-white dark:bg-zinc-900/40 backdrop-blur-md focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-sm cursor-text"
+                onClick={() => inputRef.current?.focus()}
+              >
                 {formData.skills.map((skill) => (
                   <Badge key={skill} className="flex items-center gap-1.5 px-3 py-1 bg-white/5 text-foreground border border-border/50 dark:border-white/10 font-medium text-xs">
                     {skill}
-                    <button type="button" className="rounded-full hover:text-destructive hover:bg-destructive/10 p-0.5 transition-colors" onClick={() => removeSkill(skill)}>
+                    <button type="button" className="rounded-full hover:text-destructive hover:bg-destructive/10 p-0.5 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
                       <X size={14} />
                     </button>
                   </Badge>
                 ))}
-                <input
-                  type="text"
-                  placeholder={formData.skills.length === 0 ? "e.g. React, Python, UI Design..." : "Add more..."}
-                  className="flex-1 bg-transparent border-none outline-none text-sm font-medium placeholder:text-muted-foreground/50 min-w-[150px] px-1"
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleSkillKeyDown}
-                />
+                <div className="flex-1 min-w-[150px]">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder={formData.skills.length === 0 ? "e.g. React, Python, UI Design..." : "Add more..."}
+                    className="w-full bg-transparent border-none outline-none text-sm font-medium placeholder:text-muted-foreground/50 px-1"
+                    value={skillInput}
+                    onChange={(e) => {
+                      setSkillInput(e.target.value);
+                      setShowSkillDropdown(true);
+                      setHighlightedIndex(0);
+                    }}
+                    onFocus={() => setShowSkillDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowSkillDropdown(false), 200)}
+                    onKeyDown={handleSkillKeyDown}
+                  />
+                </div>
               </div>
+
+              {showSkillDropdown && (skillInput.trim() || filteredSkills.length > 0) && (
+                <div className="absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto bg-white dark:bg-zinc-900 border border-border/50 dark:border-white/10 rounded-xl shadow-xl z-50 p-1 flex flex-col gap-1">
+                  {filteredSkills.length > 0 ? (
+                    filteredSkills.map((skill, index) => (
+                      <button
+                        key={skill}
+                        type="button"
+                        className={cn(
+                          "text-left px-3 py-2.5 rounded-lg text-sm transition-colors",
+                          highlightedIndex === index 
+                            ? "bg-accent/20 text-accent font-medium" 
+                            : "hover:bg-accent/10 hover:text-foreground"
+                        )}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          addSkill(skill);
+                        }}
+                      >
+                        {skill}
+                      </button>
+                    ))
+                  ) : (
+                    skillInput.trim() && (
+                      <button
+                        type="button"
+                        className="text-left px-3 py-2.5 rounded-lg text-sm bg-accent/20 text-accent font-medium transition-colors"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          addSkill(skillInput.trim());
+                        }}
+                      >
+                        Add "{skillInput.trim()}"
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
             </div>
             
             {/* Resume Upload Section */}

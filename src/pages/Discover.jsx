@@ -27,9 +27,12 @@ export default function Discover() {
   const [currentIdeaPage, setCurrentIdeaPage] = useState(0);
   const [hasMoreIdeas, setHasMoreIdeas] = useState(true);
 
-  const [projectsPages, setProjectsPages] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [projectsPages, setProjectsPages] = useState([]);
+  const [projectsDocs, setProjectsDocs] = useState([null]);
+  const [currentProjectPage, setCurrentProjectPage] = useState(0);
   const [hasMoreProjects, setHasMoreProjects] = useState(true);
+
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, item: null, type: null });
 
