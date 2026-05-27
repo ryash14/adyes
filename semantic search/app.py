@@ -6,6 +6,7 @@ import numpy as np
 import faiss
 import pickle
 import os
+import json
 from sentence_transformers import SentenceTransformer
 from datetime import datetime
 
@@ -15,7 +16,11 @@ CORS(app)
 # Firebase Configuration
 # Firebase Initialization
 try:
-    cred = credentials.Certificate("firebase-key.json")
+    if "FIREBASE_ADMIN_CREDENTIALS" in os.environ:
+        cred_dict = json.loads(os.environ["FIREBASE_ADMIN_CREDENTIALS"])
+        cred = credentials.Certificate(cred_dict)
+    else:
+        cred = credentials.Certificate("firebase-key.json")
     
     if not firebase_admin._apps:
         firebase_admin.initialize_app(cred)
