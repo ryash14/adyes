@@ -173,18 +173,23 @@ export default function Discover() {
     }
 
     result = [...result]; // Clone to sort
-    if (sortBy === 'newest') {
-      result.sort((a, b) => {
-        const dateA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
-        const dateB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
-        return dateB - dateA;
-      });
-    } else if (sortBy === 'likes' || sortBy === 'liked_by_me') {
-      result.sort((a, b) => {
-        const scoreA = a.upvotes || a.saves || 0;
-        const scoreB = b.upvotes || b.saves || 0;
-        return scoreB - scoreA;
-      });
+    
+    // Only apply custom sorting if we are not actively searching
+    // If we are searching, we want to keep FAISS's semantic ranking (relevance)
+    if (!searchQuery.trim()) {
+      if (sortBy === 'newest') {
+        result.sort((a, b) => {
+          const dateA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+          const dateB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
+      } else if (sortBy === 'likes' || sortBy === 'liked_by_me') {
+        result.sort((a, b) => {
+          const scoreA = a.upvotes || a.saves || 0;
+          const scoreB = b.upvotes || b.saves || 0;
+          return scoreB - scoreA;
+        });
+      }
     }
 
     return result;
