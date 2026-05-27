@@ -13,6 +13,21 @@ export default function ProfileSetup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [skillInput, setSkillInput] = useState('');
+  const [showSkillDropdown, setShowSkillDropdown] = useState(false);
+  
+  const PREDEFINED_SKILLS = [
+    "React", "Node.js", "Python", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS",
+    "UI/UX Design", "Figma", "Firebase", "Supabase", "MongoDB", "PostgreSQL",
+    "GraphQL", "Docker", "AWS", "Machine Learning", "Data Science", "Go", "Rust",
+    "C++", "Java", "Spring Boot", "DevOps", "Marketing", "Product Management",
+    "SEO", "Copywriting", "Sales", "Angular", "Vue.js", "Svelte", "React Native", "Flutter",
+    "iOS", "Android", "Solidity", "Web3"
+  ];
+
+  const filteredSkills = PREDEFINED_SKILLS.filter(s => 
+    s.toLowerCase().includes(skillInput.toLowerCase()) && 
+    !formData.skills.includes(s)
+  );
   
   const [formData, setFormData] = useState({
     role: '',
@@ -32,13 +47,25 @@ export default function ProfileSetup() {
   const handleBack = () => setStep((s) => s - 1);
 
   const handleSkillKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      const skill = skillInput.trim();
-      if (skill && !formData.skills.includes(skill) && formData.skills.length < 10) {
-        setFormData({ ...formData, skills: [...formData.skills, skill] });
+      // If there's an exact match or just one filtered skill, add it
+      const match = filteredSkills.find(s => s.toLowerCase() === skillInput.toLowerCase()) 
+                    || (filteredSkills.length > 0 ? filteredSkills[0] : null);
+                    
+      if (match && !formData.skills.includes(match) && formData.skills.length < 10) {
+        setFormData({ ...formData, skills: [...formData.skills, match] });
+        setSkillInput('');
+        setShowSkillDropdown(false);
       }
+    }
+  };
+
+  const addSkill = (skill) => {
+    if (!formData.skills.includes(skill) && formData.skills.length < 10) {
+      setFormData({ ...formData, skills: [...formData.skills, skill] });
       setSkillInput('');
+      setShowSkillDropdown(false);
     }
   };
 
@@ -139,14 +166,38 @@ export default function ProfileSetup() {
                     </button>
                   </Badge>
                 ))}
-                <input
-                  type="text"
-                  className="flex-1 bg-transparent border-none outline-none text-base placeholder:text-muted-foreground min-w-[120px]"
-                  placeholder={formData.skills.length === 0 ? "Type a skill and press Enter..." : ""}
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={handleSkillKeyDown}
-                />
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    className="w-full bg-transparent border-none outline-none text-base placeholder:text-muted-foreground min-w-[120px]"
+                    placeholder={formData.skills.length === 0 ? "Search skills..." : ""}
+                    value={skillInput}
+                    onChange={(e) => {
+                      setSkillInput(e.target.value);
+                      setShowSkillDropdown(true);
+                    }}
+                    onFocus={() => setShowSkillDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowSkillDropdown(false), 200)}
+                    onKeyDown={handleSkillKeyDown}
+                  />
+                  {showSkillDropdown && filteredSkills.length > 0 && (
+                    <div className="absolute top-full left-0 mt-2 w-64 max-h-48 overflow-y-auto bg-white dark:bg-zinc-900 border border-border rounded-xl shadow-xl z-50 p-1 flex flex-col gap-1">
+                      {filteredSkills.map(skill => (
+                        <button
+                          key={skill}
+                          type="button"
+                          className="text-left px-3 py-2 rounded-lg text-sm hover:bg-accent/10 hover:text-accent transition-colors"
+                          onMouseDown={(e) => {
+                            e.preventDefault(); // prevent blur
+                            addSkill(skill);
+                          }}
+                        >
+                          {skill}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

@@ -138,16 +138,16 @@ export default function Dashboard() {
             {STATS_CONFIG.map((stat, i) => (
               <motion.div key={stat.label} variants={fadeUp} className={`bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-border/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-all duration-500 hover:bg-white/60 dark:hover:bg-zinc-900/60 shadow-sm`}>
                 <div className={`absolute top-0 right-0 w-32 h-32 rounded-full ${stat.bg} blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700 opacity-50`} />
-                <div className="flex items-center gap-3 mb-6 relative z-10">
-                  <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color} shadow-inner`}>
-                    <stat.icon size={20} strokeWidth={2.5} />
+                <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 relative z-10">
+                  <div className={`p-2 rounded-xl ${stat.bg} ${stat.color} shadow-inner shrink-0`}>
+                    <stat.icon size={18} strokeWidth={2.5} className="md:w-5 md:h-5" />
                   </div>
-                  <span className="text-sm font-semibold text-muted-foreground">{stat.label}</span>
+                  <span className="text-xs md:text-sm font-semibold text-muted-foreground break-words line-clamp-2 leading-tight">{stat.label}</span>
                 </div>
                 <div className="mt-auto relative z-10">
-                  <span className="text-4xl font-bold tracking-tight text-foreground">
+                  <span className="text-3xl md:text-4xl font-bold tracking-tight text-foreground truncate block">
                     {loading ? (
-                      <span className="inline-block w-16 h-10 bg-white/5 rounded animate-pulse" />
+                      <span className="inline-block w-12 md:w-16 h-8 md:h-10 bg-white/5 rounded animate-pulse" />
                     ) : (
                       <AnimatedNumber value={stat.value} />
                     )}

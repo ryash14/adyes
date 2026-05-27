@@ -11,7 +11,11 @@ export default function CustomCursor() {
   // For high performance, we use requestAnimationFrame to update state
   const targetPosition = useRef({ x: 0, y: 0 });
 
+  // Detect touch device
+  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+
   useEffect(() => {
+    if (isTouchDevice) return; // Do not run custom cursor logic on touch devices
     // Inject global CSS to hide the default cursor everywhere except on inputs where text cursor is needed
     const style = document.createElement('style');
     style.innerHTML = `
@@ -73,9 +77,9 @@ export default function CustomCursor() {
       document.removeEventListener('mouseup', onMouseUp);
       cancelAnimationFrame(requestRef.current);
     };
-  }, [hidden]);
+  }, [hidden, isTouchDevice]);
 
-  if (hidden) return null;
+  if (hidden || isTouchDevice) return null;
 
   return (
     <>

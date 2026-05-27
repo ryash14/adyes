@@ -24,7 +24,6 @@ dist-ssr
 *.sw?
 
 # Python / Semantic Search
-semantic search/model_cache/
 semantic search/firebase-key.json
 semantic search/__pycache__/
 semantic search/faiss_indexes/
