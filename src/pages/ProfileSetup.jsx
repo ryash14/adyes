@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { GraduationCap, Briefcase, Rocket, X, Code, MessageCircle, Link as LinkIcon } from 'lucide-react';
@@ -14,6 +14,8 @@ export default function ProfileSetup() {
   const [error, setError] = useState('');
   const [skillInput, setSkillInput] = useState('');
   const [showSkillDropdown, setShowSkillDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const inputRef = useRef(null);
   
   const PREDEFINED_SKILLS = [
     "React", "Node.js", "Python", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS",
@@ -21,7 +23,19 @@ export default function ProfileSetup() {
     "GraphQL", "Docker", "AWS", "Machine Learning", "Data Science", "Go", "Rust",
     "C++", "Java", "Spring Boot", "DevOps", "Marketing", "Product Management",
     "SEO", "Copywriting", "Sales", "Angular", "Vue.js", "Svelte", "React Native", "Flutter",
-    "iOS", "Android", "Solidity", "Web3"
+    "iOS", "Android", "Solidity", "Web3", "Blockchain", "Smart Contracts",
+    "C#", ".NET", "PHP", "Laravel", "Ruby", "Ruby on Rails", "Django", "Flask",
+    "FastAPI", "Express.js", "NestJS", "Vuex", "Redux", "Zustand", "Apollo",
+    "Redis", "Elasticsearch", "Cassandra", "MySQL", "SQLite",
+    "Kubernetes", "Terraform", "Ansible", "Jenkins", "GitHub Actions",
+    "Azure", "Google Cloud", "DigitalOcean", "Vercel", "Netlify", "Heroku",
+    "Framer", "Adobe XD", "Sketch", "InVision", "Photoshop", "Illustrator",
+    "3D Modeling", "Blender", "Unity", "Unreal Engine", "Game Development",
+    "Cybersecurity", "Penetration Testing", "Cryptography", "Ethical Hacking",
+    "Computer Vision", "NLP", "Deep Learning", "TensorFlow", "PyTorch",
+    "Data Engineering", "Big Data", "Spark", "Hadoop", "Kafka",
+    "Business Development", "Growth Hacking", "Social Media Marketing", "Content Creation",
+    "Video Editing", "Premiere Pro", "After Effects", "Final Cut Pro"
   ];
 
   const [formData, setFormData] = useState({
@@ -47,17 +61,23 @@ export default function ProfileSetup() {
   const handleBack = () => setStep((s) => s - 1);
 
   const handleSkillKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (!showSkillDropdown) return;
+
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      // If there's an exact match or just one filtered skill, add it
-      const match = filteredSkills.find(s => s.toLowerCase() === skillInput.toLowerCase()) 
-                    || (filteredSkills.length > 0 ? filteredSkills[0] : null);
-                    
-      if (match && !formData.skills.includes(match) && formData.skills.length < 10) {
-        setFormData({ ...formData, skills: [...formData.skills, match] });
-        setSkillInput('');
-        setShowSkillDropdown(false);
+      setHighlightedIndex(prev => Math.min(prev + 1, filteredSkills.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredSkills.length > 0) {
+        addSkill(filteredSkills[highlightedIndex] || filteredSkills[0]);
+      } else if (skillInput.trim()) {
+        addSkill(skillInput.trim());
       }
+    } else if (e.key === 'Escape') {
+      setShowSkillDropdown(false);
     }
   };
 
@@ -66,6 +86,7 @@ export default function ProfileSetup() {
       setFormData({ ...formData, skills: [...formData.skills, skill] });
       setSkillInput('');
       setShowSkillDropdown(false);
+      setHighlightedIndex(0);
     }
   };
 
@@ -96,6 +117,39 @@ export default function ProfileSetup() {
     }
   };
 
+  const handleSkip = async () => {
+    setLoading(true);
+    setError('');
+    const finalPayload = {
+      ...formData,
+      role: formData.role || 'user', // Default fallback so profile is complete
+      github: '',
+      linkedin: '',
+      twitter: '',
+      portfolio: '',
+    };
+    const result = await completeProfile(finalPayload);
+    setLoading(false);
+    if (!result.error) {
+      navigate('/dashboard');
+    } else {
+      setError(result.error);
+    }
+  };
+
+  const footerContent = (
+    <div className="flex flex-col items-center gap-4 mt-2">
+      {error && <span className="text-destructive font-medium bg-destructive/10 px-4 py-2 rounded-lg inline-block">{error}</span>}
+      <button 
+        type="button"
+        onClick={handleSkip}
+        className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Skip for now
+      </button>
+    </div>
+  );
+
   return (
     <AuthLayout
       eyebrow="Profile setup"
@@ -110,7 +164,7 @@ export default function ProfileSetup() {
       progress={{ current: step, total: 3 }}
       progressLabel="Onboarding"
       wide={true}
-      footer={error ? <span className="text-destructive font-medium bg-destructive/10 px-4 py-2 rounded-lg inline-block">{error}</span> : null}
+      footer={footerContent}
     >
       <div className="flex flex-col gap-8">
         {step === 1 && (
@@ -155,50 +209,78 @@ export default function ProfileSetup() {
               />
             </label>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 relative">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Skills and Interests</span>
-              <div className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-lg border-2 border-border bg-white dark:bg-zinc-900/50 backdrop-blur-sm focus-within:ring-2 focus-within:ring-accent focus-within:border-accent transition-all">
+              <div 
+                className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-lg border-2 border-border bg-white dark:bg-zinc-900/50 backdrop-blur-sm focus-within:ring-2 focus-within:ring-accent focus-within:border-accent transition-all cursor-text"
+                onClick={() => inputRef.current?.focus()}
+              >
                 {formData.skills.map((skill) => (
                   <Badge key={skill} className="flex items-center gap-1.5 pr-1.5 py-1 text-sm bg-zinc-800 border-border text-foreground rounded-md px-2">
                     {skill}
-                    <button type="button" className="rounded-full hover:bg-zinc-700 p-1 transition-colors" onClick={() => removeSkill(skill)}>
+                    <button type="button" className="rounded-full hover:bg-zinc-700 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
                       <X size={14} strokeWidth={2.5} className="text-muted-foreground hover:text-foreground" />
                     </button>
                   </Badge>
                 ))}
-                <div className="flex-1 relative">
+                <div className="flex-1 min-w-[120px]">
                   <input
+                    ref={inputRef}
                     type="text"
-                    className="w-full bg-transparent border-none outline-none text-base placeholder:text-muted-foreground min-w-[120px]"
+                    className="w-full bg-transparent border-none outline-none text-base placeholder:text-muted-foreground"
                     placeholder={formData.skills.length === 0 ? "Search skills..." : ""}
                     value={skillInput}
                     onChange={(e) => {
                       setSkillInput(e.target.value);
                       setShowSkillDropdown(true);
+                      setHighlightedIndex(0);
                     }}
                     onFocus={() => setShowSkillDropdown(true)}
                     onBlur={() => setTimeout(() => setShowSkillDropdown(false), 200)}
                     onKeyDown={handleSkillKeyDown}
                   />
-                  {showSkillDropdown && filteredSkills.length > 0 && (
-                    <div className="absolute top-full left-0 mt-2 w-64 max-h-48 overflow-y-auto bg-white dark:bg-zinc-900 border border-border rounded-xl shadow-xl z-50 p-1 flex flex-col gap-1">
-                      {filteredSkills.map(skill => (
-                        <button
-                          key={skill}
-                          type="button"
-                          className="text-left px-3 py-2 rounded-lg text-sm hover:bg-accent/10 hover:text-accent transition-colors"
-                          onMouseDown={(e) => {
-                            e.preventDefault(); // prevent blur
-                            addSkill(skill);
-                          }}
-                        >
-                          {skill}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
+
+              {/* Absolute Dropdown positioned relative to the entire "Skills and Interests" flex column */}
+              {showSkillDropdown && (skillInput.trim() || filteredSkills.length > 0) && (
+                <div className="absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto bg-white dark:bg-zinc-900 border border-border rounded-xl shadow-xl z-50 p-1 flex flex-col gap-1">
+                  {filteredSkills.length > 0 ? (
+                    filteredSkills.map((skill, index) => (
+                      <button
+                        key={skill}
+                        type="button"
+                        className={cn(
+                          "text-left px-3 py-2.5 rounded-lg text-sm transition-colors",
+                          highlightedIndex === index 
+                            ? "bg-accent/20 text-accent font-medium" 
+                            : "hover:bg-accent/10 hover:text-accent"
+                        )}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // prevent blur
+                          addSkill(skill);
+                        }}
+                      >
+                        {skill}
+                      </button>
+                    ))
+                  ) : (
+                    skillInput.trim() && (
+                      <button
+                        type="button"
+                        className="text-left px-3 py-2.5 rounded-lg text-sm bg-accent/20 text-accent font-medium transition-colors"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          addSkill(skillInput.trim());
+                        }}
+                      >
+                        Add "{skillInput.trim()}"
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
             </div>
 
             <label className="flex flex-col gap-2">
