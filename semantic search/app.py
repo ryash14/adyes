@@ -103,6 +103,46 @@ def initialize_indexes():
         dimension = 384
         projects_index = faiss.IndexFlatL2(dimension)
         projects_metadata = []
+        
+        # If we have Firebase, auto-rebuild since the disk might have been wiped
+        if FIREBASE_ENABLED:
+            print("Auto-rebuilding indexes from Firebase...")
+            do_rebuild_indexes()
+
+
+def do_rebuild_indexes():
+    global ideas_index, projects_index
+    global ideas_metadata, projects_metadata
+
+    try:
+        print("\n========== AUTO-REBUILDING FAISS INDEXES ==========\n")
+
+        print("Fetching ideas from Firebase...")
+        ideas_docs = list(db.collection('ideas').stream())
+        print(f"Found {len(ideas_docs)} ideas\n")
+
+        for i, doc in enumerate(ideas_docs):
+            try:
+                data = doc.to_dict()
+                add_to_index('ideas', doc.id, data)
+            except Exception as e:
+                pass
+
+        print("\nFetching projects from Firebase...")
+        projects_docs = list(db.collection('projects').stream())
+        print(f"Found {len(projects_docs)} projects\n")
+
+        for i, doc in enumerate(projects_docs):
+            try:
+                data = doc.to_dict()
+                add_to_index('projects', doc.id, data)
+            except Exception as e:
+                pass
+
+        save_indexes()
+        print("\n========== INDEXING COMPLETE ==========\n")
+    except Exception as e:
+        print(f"\nREBUILD ERROR: {e}\n")
 
 
 def save_indexes():
@@ -352,74 +392,20 @@ def rebuild_indexes():
     global ideas_index, projects_index
     global ideas_metadata, projects_metadata
 
-    try:
-        print("\n========== REBUILDING FAISS INDEXES ==========\n")
+    # Reset indexes
+    dimension = 384
+    ideas_index = faiss.IndexFlatL2(dimension)
+    projects_index = faiss.IndexFlatL2(dimension)
+    ideas_metadata = []
+    projects_metadata = []
 
-        # Reset indexes
-        dimension = 384
+    do_rebuild_indexes()
 
-        ideas_index = faiss.IndexFlatL2(dimension)
-        projects_index = faiss.IndexFlatL2(dimension)
-
-        ideas_metadata = []
-        projects_metadata = []
-
-        # -----------------------------
-        # INDEX IDEAS
-        # -----------------------------
-        print("Fetching ideas from Firebase...")
-
-        ideas_docs = list(db.collection('ideas').stream())
-
-        print(f"Found {len(ideas_docs)} ideas\n")
-
-        for i, doc in enumerate(ideas_docs):
-            try:
-                data = doc.to_dict()
-
-                print(f"[IDEAS] Indexing {i+1}/{len(ideas_docs)} -> {doc.id}")
-
-                add_to_index('ideas', doc.id, data)
-
-            except Exception as e:
-                print(f"Failed indexing idea {doc.id}: {e}")
-
-        # -----------------------------
-        # INDEX PROJECTS
-        # -----------------------------
-        print("\nFetching projects from Firebase...")
-
-        projects_docs = list(db.collection('projects').stream())
-
-        print(f"Found {len(projects_docs)} projects\n")
-
-        for i, doc in enumerate(projects_docs):
-            try:
-                data = doc.to_dict()
-
-                print(f"[PROJECTS] Indexing {i+1}/{len(projects_docs)} -> {doc.id}")
-
-                add_to_index('projects', doc.id, data)
-
-            except Exception as e:
-                print(f"Failed indexing project {doc.id}: {e}")
-
-        # Final save
-        save_indexes()
-
-        print("\n========== INDEXING COMPLETE ==========\n")
-        print(f"Ideas Indexed: {len(ideas_metadata)}")
-        print(f"Projects Indexed: {len(projects_metadata)}")
-
-        return jsonify({
-            'success': True,
-            'ideas_indexed': len(ideas_metadata),
-            'projects_indexed': len(projects_metadata)
-        })
-
-    except Exception as e:
-        print(f"\nREBUILD ERROR: {e}\n")
-        return jsonify({'error': str(e)}), 500
+    return jsonify({
+        'success': True,
+        'ideas_indexed': len(ideas_metadata),
+        'projects_indexed': len(projects_metadata)
+    })
 
 print("Initializing indexes...")
 initialize_indexes()
