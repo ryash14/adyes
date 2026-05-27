@@ -134,6 +134,31 @@ class SemanticSearchService {
   }
 
   /**
+   * Delete an idea or project
+   * @param {string} type - 'ideas' or 'projects'
+   * @param {string} id - Document ID
+   * @returns {Promise<boolean>} - Success status
+   */
+  async deleteContent(type, id) {
+    try {
+      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Content deletion failed');
+      }
+
+      return true;
+    } catch (error) {
+      console.warn('Content deletion failed:', error);
+      return false;
+    }
+  }
+
+  /**
    * Get semantic search statistics
    * @returns {Promise<Object>} - Statistics object
    */

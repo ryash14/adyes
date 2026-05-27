@@ -37,6 +37,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
   const [showConnectForm, setShowConnectForm] = useState(false);
   const [connectNote, setConnectNote] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -76,8 +77,42 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!user || !item || user.uid !== item.userId || isDeleting) return;
+    
+    if (!window.confirm(`Are you sure you want to delete this ${isIdea ? 'idea' : 'project'}?`)) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      const deleteFn = isIdea ? contentService.deleteIdea.bind(contentService) : contentService.deleteProject.bind(contentService);
+      const res = await deleteFn(item.id);
+      
+      if (!res.error) {
+        toast.success('Successfully deleted!');
+        onClose();
+        // Option to reload the page to refresh the items
+        window.location.reload();
+      } else {
+        toast.error(res.error || 'Failed to delete');
+      }
+    } catch (err) {
+      toast.error('An error occurred during deletion');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const footer = (
-    <div className="flex justify-end items-center w-full">
+    <div className="flex justify-between items-center w-full">
+      <div>
+        {user && item && user.uid === item.userId && (
+          <button onClick={handleDelete} className="btn border border-destructive text-destructive hover:bg-destructive/10 h-10 px-4 rounded-xl" disabled={isDeleting}>
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
+        )}
+      </div>
       <button onClick={onClose} className="btn btn-primary">Close</button>
     </div>
   );

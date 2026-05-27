@@ -344,6 +344,11 @@ class ContentService {
     try {
       const ideaRef = doc(db, 'ideas', ideaId);
       await deleteDoc(ideaRef);
+      try {
+        await semanticSearchService.deleteContent('ideas', ideaId);
+      } catch (err) {
+        console.warn('Failed to delete idea from semantic search API:', err);
+      }
       return { error: null };
     } catch (error) {
       console.error('Error deleting idea:', error);
@@ -358,6 +363,11 @@ class ContentService {
     try {
       const projectRef = doc(db, 'projects', projectId);
       await deleteDoc(projectRef);
+      try {
+        await semanticSearchService.deleteContent('projects', projectId);
+      } catch (err) {
+        console.warn('Failed to delete project from semantic search API:', err);
+      }
       return { error: null };
     } catch (error) {
       console.error('Error deleting project:', error);
