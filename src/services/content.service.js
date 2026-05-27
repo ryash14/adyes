@@ -31,22 +31,25 @@ class ContentService {
       const userId = dataOrUndefined ? userIdOrData : ideaData.userId;
       const finalData = { ...ideaData, userId };
       
-      console.log('Creating idea with data:', finalData);
+      console.log('Creating idea in Firebase:', finalData);
       
+      // 1. Save to Firebase FIRST
+      const ideasRef = collection(db, 'ideas');
+      const docRef = await addDoc(ideasRef, {
+        ...finalData,
+        type: 'idea',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      
+      // 2. Sync to Semantic Search
       try {
-        const res = await semanticSearchService.submitContent('ideas', finalData);
-        return { data: { id: res.id }, error: null };
+        await semanticSearchService.submitContent('ideas', { ...finalData, id: docRef.id });
       } catch (err) {
-        console.warn('Semantic search API failed, falling back to Firebase', err);
-        const ideasRef = collection(db, 'ideas');
-        const docRef = await addDoc(ideasRef, {
-          ...finalData,
-          type: 'idea',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-        return { data: { id: docRef.id }, error: null };
+        console.warn('Semantic search API sync failed, but saved to Firebase successfully', err);
       }
+      
+      return { data: { id: docRef.id }, error: null };
     } catch (error) {
       console.error('Error creating idea:', error);
       return { data: null, error: error.message };
@@ -62,22 +65,25 @@ class ContentService {
       const userId = dataOrUndefined ? userIdOrData : projectData.userId;
       const finalData = { ...projectData, userId };
       
-      console.log('Creating project with data:', finalData);
+      console.log('Creating project in Firebase:', finalData);
       
+      // 1. Save to Firebase FIRST
+      const projectsRef = collection(db, 'projects');
+      const docRef = await addDoc(projectsRef, {
+        ...finalData,
+        type: 'project',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      
+      // 2. Sync to Semantic Search
       try {
-        const res = await semanticSearchService.submitContent('projects', finalData);
-        return { data: { id: res.id }, error: null };
+        await semanticSearchService.submitContent('projects', { ...finalData, id: docRef.id });
       } catch (err) {
-        console.warn('Semantic search API failed, falling back to Firebase', err);
-        const projectsRef = collection(db, 'projects');
-        const docRef = await addDoc(projectsRef, {
-          ...finalData,
-          type: 'project',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-        return { data: { id: docRef.id }, error: null };
+        console.warn('Semantic search API sync failed, but saved to Firebase successfully', err);
       }
+      
+      return { data: { id: docRef.id }, error: null };
     } catch (error) {
       console.error('Error creating project:', error);
       return { data: null, error: error.message };
