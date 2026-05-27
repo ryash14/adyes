@@ -267,14 +267,17 @@ def submit():
     }
     
     try:
-        # Add to Firebase
-        if FIREBASE_ENABLED:
-            collection_name = collection_type
-            doc_ref = db.collection(collection_name).add(doc_data)
-            doc_id = doc_ref[1].id
-        else:
-            # Generate a dummy ID for demo mode
-            doc_id = f"demo_{collection_type}_{len(ideas_metadata if collection_type == 'ideas' else projects_metadata)}"
+        doc_id = data.get('id')
+        
+        # Add to Firebase ONLY if id was not provided
+        if not doc_id:
+            if FIREBASE_ENABLED:
+                collection_name = collection_type
+                doc_ref = db.collection(collection_name).add(doc_data)
+                doc_id = doc_ref[1].id
+            else:
+                # Generate a dummy ID for demo mode
+                doc_id = f"demo_{collection_type}_{len(ideas_metadata if collection_type == 'ideas' else projects_metadata)}"
         
         # Add to FAISS index
         add_to_index(collection_type, doc_id, doc_data)
