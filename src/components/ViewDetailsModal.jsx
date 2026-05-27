@@ -33,9 +33,6 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
   };
 
   const { user } = useAuth();
-  const [upvotes, setUpvotes] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isLiking, setIsLiking] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState(null);
   const [showConnectForm, setShowConnectForm] = useState(false);
   const [connectNote, setConnectNote] = useState('');
@@ -43,9 +40,6 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
 
   useEffect(() => {
     if (item) {
-      setUpvotes(item.upvotes || item.saves || 0);
-      setIsLiked(user ? (item.likedBy || []).includes(user.uid) : false);
-      
       if (user && user.uid !== item.userId) {
         connectionService.getConnection(user.uid, item.userId).then((res) => {
           if (res.data) {
@@ -59,37 +53,6 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
       }
     }
   }, [item, user]);
-
-  const handleLike = async () => {
-    if (!user || isLiking) return;
-    
-    // Optimistic update
-    setIsLiking(true);
-    const wasLiked = isLiked;
-    setIsLiked(!wasLiked);
-    setUpvotes(prev => prev + (wasLiked ? -1 : 1));
-
-    try {
-      const collectionType = isIdea ? 'ideas' : 'projects';
-      const res = await contentService.toggleLike(collectionType, item.id, user.uid);
-      if (res.error) {
-        // Revert on error
-        setIsLiked(wasLiked);
-        setUpvotes(prev => prev + (wasLiked ? 1 : -1));
-        console.error('Failed to toggle like:', res.error);
-      } else {
-        // Sync with server state
-        setUpvotes(res.data.upvotes);
-        setIsLiked(res.data.isLiked);
-      }
-    } catch (err) {
-      // Revert on error
-      setIsLiked(wasLiked);
-      setUpvotes(prev => prev + (wasLiked ? 1 : -1));
-    } finally {
-      setIsLiking(false);
-    }
-  };
 
   const handleConnect = async () => {
     if (!user || isConnecting) return;
@@ -114,24 +77,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
   };
 
   const footer = (
-    <div className="flex justify-between items-center w-full">
-      <div className="flex gap-4">
-        <button 
-          onClick={handleLike}
-          disabled={!user || isLiking}
-          className={cn(
-            "flex items-center gap-1.5 transition-colors group",
-            isLiked ? "text-red-500" : "text-muted-foreground hover:text-red-500",
-            !user && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <Heart 
-            size={18} 
-            className={cn("transition-transform group-active:scale-95", isLiked && "fill-current")} 
-          />
-          <span className="text-sm font-medium">{upvotes}</span>
-        </button>
-      </div>
+    <div className="flex justify-end items-center w-full">
       <button onClick={onClose} className="btn btn-primary">Close</button>
     </div>
   );

@@ -75,15 +75,10 @@ export default function Dashboard() {
         const allIdeas = ideasRes.data || [];
         const allProjects = projectsRes.data || [];
         
-        const totalSaves = 
-          allIdeas.reduce((sum, item) => sum + (item.saves || 0), 0) +
-          allProjects.reduce((sum, item) => sum + (item.saves || 0), 0);
-
         setStats({
           ideas: allIdeas.length,
           projects: allProjects.length,
-          connections: connRes.data?.length || 0,
-          saves: totalSaves
+          connections: connRes.data?.length || 0
         });
         
         setRecentIdeas(allIdeas.slice(0, 3));
@@ -101,7 +96,6 @@ export default function Dashboard() {
     { label: 'Active Ideas', value: stats.ideas, icon: Lightbulb, color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/20' },
     { label: 'Live Projects', value: stats.projects, icon: Rocket, color: 'text-accent', bg: 'bg-accent/10', border: 'border-accent/20' },
     { label: 'Network', value: stats.connections, icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
-    { label: 'Total Saves', value: stats.saves, icon: Star, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/20' },
   ];
 
   return (
@@ -133,7 +127,7 @@ export default function Dashboard() {
             variants={staggerContainer}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6"
           >
             {STATS_CONFIG.map((stat, i) => (
               <motion.div key={stat.label} variants={fadeUp} className={`bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-border/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group transition-all duration-500 hover:bg-white/60 dark:hover:bg-zinc-900/60 shadow-sm`}>
@@ -210,7 +204,6 @@ export default function Dashboard() {
                                 <Clock size={12} className="md:w-[14px] md:h-[14px]" /> 
                                 {new Date(idea.createdAt?.seconds ? idea.createdAt.seconds * 1000 : idea.createdAt).toLocaleDateString()}
                               </span>
-                              <span className="flex items-center gap-1 md:gap-1.5 text-accent whitespace-nowrap"><Star size={12} className="md:w-[14px] md:h-[14px]" /> {idea.saves || 0} Saves</span>
                             </div>
                           </div>
                         </motion.div>

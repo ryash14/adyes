@@ -27,15 +27,11 @@ export default function Discover() {
   const [currentIdeaPage, setCurrentIdeaPage] = useState(0);
   const [hasMoreIdeas, setHasMoreIdeas] = useState(true);
 
-  const [projectsPages, setProjectsPages] = useState([]);
-  const [projectsDocs, setProjectsDocs] = useState([null]);
-  const [currentProjectPage, setCurrentProjectPage] = useState(0);
-  const [hasMoreProjects, setHasMoreProjects] = useState(true);
-
+  const [projectsPages, setProjectsPages] = useState({});
   const [loading, setLoading] = useState(true);
+  const [hasMoreProjects, setHasMoreProjects] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, item: null, type: null });
-  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'likes', 'liked_by_me'
 
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -158,10 +154,6 @@ export default function Discover() {
         : (projectsPages[currentProjectPage] || []);
     }
 
-    if (sortBy === 'liked_by_me' && user) {
-      result = result.filter(item => item.likedBy?.includes(user.uid));
-    }
-
     if (searchQuery.trim() && semanticResults === null) {
       const query = searchQuery.toLowerCase();
       result = result.filter((item) => {
@@ -177,23 +169,15 @@ export default function Discover() {
     // Only apply custom sorting if we are not actively searching
     // If we are searching, we want to keep FAISS's semantic ranking (relevance)
     if (!searchQuery.trim()) {
-      if (sortBy === 'newest') {
-        result.sort((a, b) => {
-          const dateA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
-          const dateB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
-          return dateB - dateA;
-        });
-      } else if (sortBy === 'likes' || sortBy === 'liked_by_me') {
-        result.sort((a, b) => {
-          const scoreA = a.upvotes || a.saves || 0;
-          const scoreB = b.upvotes || b.saves || 0;
-          return scoreB - scoreA;
-        });
-      }
+      result.sort((a, b) => {
+        const dateA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+        const dateB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      });
     }
 
     return result;
-  }, [activeTab, searchQuery, ideasPages, currentIdeaPage, projectsPages, currentProjectPage, semanticResults, sortBy, user]);
+  }, [activeTab, searchQuery, ideasPages, currentIdeaPage, projectsPages, currentProjectPage, semanticResults]);
 
   const currentPageIndex = activeTab === 'ideas' ? currentIdeaPage : currentProjectPage;
 
@@ -286,21 +270,6 @@ export default function Discover() {
           </Tabs>
 
           <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <Filter size={16} className="text-muted-foreground shrink-0" />
-              <div className="w-full md:w-[160px] relative z-[45]">
-                <CustomSelect
-                  value={sortBy}
-                  onChange={setSortBy}
-                  options={[
-                    { label: 'Newest', value: 'newest' },
-                    { label: 'Most Liked', value: 'likes' },
-                    ...(user ? [{ label: 'Liked by Me', value: 'liked_by_me' }] : [])
-                  ]}
-                  placeholder="Sort by"
-                />
-              </div>
-            </div>
 
             <div className="relative w-full md:w-[320px]">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" size={18} />
@@ -333,17 +302,12 @@ export default function Discover() {
             <EmptyState
               icon={Search}
               title="No results found"
-              text={
-                sortBy === 'liked_by_me' 
-                ? `You haven't liked any ${activeTab} on this page yet.`
-                : `We couldn't find any ${activeTab} matching your search.`
-              }
+              text={`We couldn't find any ${activeTab} matching your search.`}
             />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {paginatedItems.map((item) => {
-              const isLikedByMe = user && item.likedBy?.includes(user.uid);
               return (
                 <div
                   key={item.id}
@@ -377,10 +341,6 @@ export default function Discover() {
                       )}
                     </div>
                     <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground">
-                      <span className={cn("flex items-center gap-1.5 transition-colors", isLikedByMe && "text-red-400")}>
-                        <Heart size={14} className={cn(isLikedByMe && "fill-current")} /> 
-                        {item.upvotes || item.saves || 0}
-                      </span>
                       <span className="flex items-center gap-1.5">
                         <Clock size={14} /> 
                         {item.createdAt 
