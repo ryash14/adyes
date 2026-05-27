@@ -365,8 +365,9 @@ def rebuild_indexes():
         print(f"\nREBUILD ERROR: {e}\n")
         return jsonify({'error': str(e)}), 500
 
+print("Initializing indexes...")
+initialize_indexes()
+
 if __name__ == '__main__':
-    print("Initializing indexes...")
-    initialize_indexes()
     print("Starting Flask server...")
     app.run(debug=True, host='0.0.0.0', port=5108)
