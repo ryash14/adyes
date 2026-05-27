@@ -24,11 +24,6 @@ export default function ProfileSetup() {
     "iOS", "Android", "Solidity", "Web3"
   ];
 
-  const filteredSkills = PREDEFINED_SKILLS.filter(s => 
-    s.toLowerCase().includes(skillInput.toLowerCase()) && 
-    !formData.skills.includes(s)
-  );
-  
   const [formData, setFormData] = useState({
     role: '',
     college: '',
@@ -39,6 +34,11 @@ export default function ProfileSetup() {
     twitter: '',
     portfolio: '',
   });
+
+  const filteredSkills = PREDEFINED_SKILLS.filter(s => 
+    s.toLowerCase().includes(skillInput.toLowerCase()) && 
+    !formData.skills.includes(s)
+  );
 
   const { completeProfile, user } = useAuth();
   const navigate = useNavigate();

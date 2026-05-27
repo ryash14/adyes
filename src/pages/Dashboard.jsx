@@ -165,10 +165,10 @@ export default function Dashboard() {
               transition={{ delay: 0.3 }}
               className="lg:col-span-2 space-y-6"
             >
-              <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-border/50 p-6 md:p-8 rounded-3xl min-h-[400px] shadow-sm relative overflow-hidden">
+              <div className="bg-white dark:bg-zinc-900/40 backdrop-blur-md border border-border/50 p-4 md:p-8 rounded-2xl md:rounded-3xl min-h-[400px] shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6 md:mb-8">
                   <div>
                     <h2 className="text-xl font-bold tracking-tight text-foreground">Recent Ideas</h2>
                     <p className="text-sm text-muted-foreground mt-1">Your latest shared concepts</p>
@@ -181,9 +181,9 @@ export default function Dashboard() {
                 <div className="space-y-3">
                   {loading ? (
                     Array(3).fill(0).map((_, i) => (
-                      <div key={i} className="flex gap-4 p-4 rounded-2xl bg-black/5 dark:bg-white/5 animate-pulse border border-border/50">
-                        <div className="w-12 h-12 rounded-xl bg-black/10 dark:bg-white/10 shrink-0" />
-                        <div className="space-y-2 flex-1 pt-1">
+                      <div key={i} className="flex gap-3 md:gap-4 p-4 rounded-2xl bg-black/5 dark:bg-white/5 animate-pulse border border-border/50">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-black/10 dark:bg-white/10 shrink-0" />
+                        <div className="space-y-2 flex-1 pt-1 min-w-0">
                           <div className="h-4 w-1/3 bg-black/10 dark:bg-white/10 rounded" />
                           <div className="h-3 w-2/3 bg-black/10 dark:bg-white/10 rounded" />
                         </div>
@@ -197,20 +197,20 @@ export default function Dashboard() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.1 }}
-                          className="group flex gap-5 p-5 rounded-2xl border border-border/50 bg-white dark:bg-white/[0.02] hover:bg-white/80 dark:hover:bg-white/[0.04] hover:border-border transition-all cursor-pointer shadow-sm"
+                          className="group flex gap-3 md:gap-5 p-4 md:p-5 rounded-2xl border border-border/50 bg-white dark:bg-white/[0.02] hover:bg-white/80 dark:hover:bg-white/[0.04] hover:border-border transition-all cursor-pointer shadow-sm"
                         >
-                          <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-inner">
-                            <Lightbulb size={20} strokeWidth={2.5} />
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-inner">
+                            <Lightbulb size={20} strokeWidth={2.5} className="w-5 h-5" />
                           </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors text-base">{idea.title}</h3>
-                            <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{idea.description}</p>
-                            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground font-medium">
-                              <span className="flex items-center gap-1.5">
-                                <Clock size={14} /> 
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors text-sm md:text-base truncate">{idea.title}</h3>
+                            <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-1">{idea.description}</p>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 md:mt-3 text-[10px] md:text-xs text-muted-foreground font-medium">
+                              <span className="flex items-center gap-1 md:gap-1.5 whitespace-nowrap">
+                                <Clock size={12} className="md:w-[14px] md:h-[14px]" /> 
                                 {new Date(idea.createdAt?.seconds ? idea.createdAt.seconds * 1000 : idea.createdAt).toLocaleDateString()}
                               </span>
-                              <span className="flex items-center gap-1.5 text-accent"><Star size={14} /> {idea.saves || 0} Saves</span>
+                              <span className="flex items-center gap-1 md:gap-1.5 text-accent whitespace-nowrap"><Star size={12} className="md:w-[14px] md:h-[14px]" /> {idea.saves || 0} Saves</span>
                             </div>
                           </div>
                         </motion.div>
