@@ -1,3 +1,10 @@
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import firebase_admin
@@ -5,7 +12,6 @@ from firebase_admin import credentials, firestore
 import numpy as np
 import faiss
 import pickle
-import os
 import json
 from sentence_transformers import SentenceTransformer
 from datetime import datetime
@@ -40,7 +46,11 @@ except Exception as e:
 print("Loading embedding model...")
 model_cache_path = os.path.join(os.path.dirname(__file__), 'model_cache')
 os.makedirs(model_cache_path, exist_ok=True)
-model = SentenceTransformer('all-MiniLM-L6-v2', cache_folder=model_cache_path)  # Lightweight model
+
+import torch
+torch.set_num_threads(1)
+
+model = SentenceTransformer('all-MiniLM-L6-v2', cache_folder=model_cache_path, device='cpu')  # Lightweight model on CPU
 print("Model loaded successfully!")
 
 # FAISS indexes
