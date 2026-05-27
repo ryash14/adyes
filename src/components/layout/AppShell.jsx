@@ -213,6 +213,7 @@ export default function AppShell({ children, fullBleed = false }) {
           </Link>
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <NotificationCenter placement="below" />
           <Link to={`/profile/${profile?.id}`}>
             <Avatar src={profile?.photoURL} fallback={initials} size="sm" />

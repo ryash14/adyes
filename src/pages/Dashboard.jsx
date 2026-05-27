@@ -142,7 +142,7 @@ export default function Dashboard() {
                   <div className={`p-2 rounded-xl ${stat.bg} ${stat.color} shadow-inner shrink-0`}>
                     <stat.icon size={18} strokeWidth={2.5} className="md:w-5 md:h-5" />
                   </div>
-                  <span className="text-xs md:text-sm font-semibold text-muted-foreground break-words line-clamp-2 leading-tight">{stat.label}</span>
+                  <span className="text-xs md:text-sm font-semibold text-muted-foreground whitespace-normal break-words leading-tight flex-1">{stat.label}</span>
                 </div>
                 <div className="mt-auto relative z-10">
                   <span className="text-3xl md:text-4xl font-bold tracking-tight text-foreground truncate block">
