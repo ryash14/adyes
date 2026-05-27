@@ -104,7 +104,7 @@ export default function Discover() {
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const response = await fetch('http://localhost:5108/api/search', {
+        const response = await fetch('https://collabhub-dmnz.onrender.com/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -3,7 +3,7 @@
  * Handles all semantic search operations for ideas, projects, and profiles
  */
 
-const SEMANTIC_SEARCH_BASE_URL = 'http://localhost:5108';
+const SEMANTIC_SEARCH_BASE_URL = 'https://collabhub-dmnz.onrender.com';
 
 class SemanticSearchService {
   /**

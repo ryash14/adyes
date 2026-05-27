@@ -1,4 +1,4 @@
-const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL || 'http://localhost:5108';
+const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL || 'https://collabhub-dmnz.onrender.com';
 
 export const searchProfiles = async (query, topK = 20) => {
   try {
