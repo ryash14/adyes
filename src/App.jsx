@@ -17,6 +17,7 @@ const Messages = lazy(() => import('./pages/Messages'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const Settings = lazy(() => import('./pages/Settings'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PageLoader = () => (
   <div className="page-loader">
@@ -94,6 +95,7 @@ function App() {
             <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/" element={<HomeRoute />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         <Toast />

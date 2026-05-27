@@ -1,0 +1,7 @@
+flask
+flask-cors
+sentence-transformers
+firebase-admin
+faiss-cpu
+numpy
+gunicorn
