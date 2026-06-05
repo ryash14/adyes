@@ -105,9 +105,10 @@ export default function Discover() {
  e.stopPropagation();
  if (!user) { toast.error('Sign in to collaborate'); return; }
  const itemUserId = item.userId || item.authorId;
+ if (!itemUserId) { toast.error('Cannot collaborate: author information missing.'); return; }
  if (user.uid === itemUserId) { toast.error('This is your own item!'); return; }
  try {
- const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${activeTab === 'ideas' ? 'idea' : 'project'}"${item.title}".`;
+ const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${activeTab === 'ideas' ? 'idea' : 'project'} "${item.title}".`;
  const res = await connectionService.sendRequest(user.uid, itemUserId, note);
  if (!res?.error) { 
    toast.success('Collaboration request sent!');

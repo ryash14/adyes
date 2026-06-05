@@ -87,9 +87,10 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
 
  const handleConnect = async () => {
  if (!user || isConnecting) return;
+ if (!itemUserId) { toast.error('Cannot connect: author information missing.'); return; }
  setIsConnecting(true);
  try {
- const defaultNote = `Hi ${item.authorName || 'there'}! I saw your ${isIdea ? 'idea' : 'project'}"${item.title}" and would love to connect.`;
+ const defaultNote = `Hi ${item.authorName || 'there'}! I saw your ${isIdea ? 'idea' : 'project'} "${item.title}" and would love to connect.`;
  const finalNote = connectNote.trim() || defaultNote;
  
  const res = await connectionService.sendRequest(user.uid, itemUserId, finalNote);
@@ -109,10 +110,11 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
 
  const handleCollab = async () => {
  if (!user || isCollabbing) return;
+ if (!itemUserId) { toast.error('Cannot collaborate: author information missing.'); return; }
  if (user.uid === itemUserId) { toast.error('This is your own item!'); return; }
  setIsCollabbing(true);
  try {
- const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'}"${item.title}".`;
+ const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'} "${item.title}".`;
  const res = await connectionService.sendRequest(user.uid, itemUserId, note);
  if (!res?.error) {
  toast.success('Collaboration request sent!');

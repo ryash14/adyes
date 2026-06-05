@@ -83,12 +83,14 @@ export default function PostDetails() {
   };
 
  const handleCollab = async () => {
- if (!user || isCollabbing) return;
- if (user.uid === item.userId) { toast.error('This is your own item!'); return; }
- setIsCollabbing(true);
- try {
- const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'}"${item.title}".`;
- const res = await connectionService.sendRequest(user.uid, item.userId || item.authorId, note);
+   if (!user || isCollabbing) return;
+   const itemUserId = item.userId || item.authorId;
+   if (!itemUserId) { toast.error('Cannot collaborate: author information missing.'); return; }
+   if (user.uid === itemUserId) { toast.error('This is your own item!'); return; }
+   setIsCollabbing(true);
+   try {
+     const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'} "${item.title}".`;
+     const res = await connectionService.sendRequest(user.uid, itemUserId, note);
  if (!res?.error) {
  toast.success('Collaboration request sent!');
  } else {
