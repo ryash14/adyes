@@ -6,7 +6,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
   GithubAuthProvider,
@@ -75,11 +75,11 @@ class AuthService {
   /**
    * Sign in with Google
    */
-  async signInWithGoogle() {
-    try {
-      const result = await signInWithPopup(auth, this.googleProvider);
-      return await this.handleOAuthResult(result);
-    } catch (error) {
+   async signInWithGoogle() {
+     try {
+       await signInWithRedirect(auth, this.googleProvider);
+       return { error: null }; // The actual result is handled by handleRedirectResult on page load
+     } catch (error) {
       console.error('Google sign in error:', error);
       
       // Handle specific Firebase errors
@@ -97,11 +97,11 @@ class AuthService {
   /**
    * Sign in with GitHub
    */
-  async signInWithGithub() {
-    try {
-      const result = await signInWithPopup(auth, this.githubProvider);
-      return await this.handleOAuthResult(result);
-    } catch (error) {
+   async signInWithGithub() {
+     try {
+       await signInWithRedirect(auth, this.githubProvider);
+       return { error: null };
+     } catch (error) {
       console.error('GitHub sign in error:', error);
       
       if (error.code === 'auth/account-exists-with-different-credential') {

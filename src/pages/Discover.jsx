@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { contentService } from '../services/content.service';
 import { connectionService } from '../services/connection.service';
+import { userService } from '../services/user.service';
 import { Search, Sparkles, Rocket, Plus, Filter, Clock, Heart, ChevronLeft, ChevronRight, BookmarkPlus, MessageSquare, Handshake, ShieldCheck } from 'lucide-react';
 import AppShell from '../components/layout/AppShell';
 import { PageHeader } from '../components/layout/PageContainer';
@@ -83,7 +84,7 @@ export default function Discover() {
  if (!user) { toast.error('Sign in to save items'); return; }
  
  try {
- const res = await import('../services/user.service').then(m => m.userService.toggleSavedItem(user.uid, item.id));
+ const res = await userService.toggleSavedItem(user.uid, item.id);
  if (!res.error) {
  setSavedItems(new Set(res.data));
  if (res.isSaved) toast.success('Saved to your list!');
