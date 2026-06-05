@@ -7,6 +7,7 @@ import { Sparkles, Rocket, Clock, Heart, UserPlus, Check, Clock3, ShieldCheck, M
 import { useAuth } from '../hooks/useAuth';
 import { contentService } from '../services/content.service';
 import { connectionService } from '../services/connection.service';
+import { userService } from '../services/user.service';
 import toast from 'react-hot-toast';
 import { cn } from '../utils/cn';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -17,6 +18,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
 
  const isIdea = type === 'ideas' || type === 'idea';
  const Icon = isIdea ? Sparkles : Rocket;
+ const itemUserId = item?.userId || item?.authorId;
  
  // Format date safely
  let dateStr = '';
@@ -31,7 +33,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  const handleProfileClick = () => {
  if (!item) return;
  onClose();
- navigate(`/profile/${item.userId}`);
+ navigate(`/profile/${itemUserId}`);
  };
 
  const { user, profile } = useAuth();
@@ -51,9 +53,9 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  const debateRef = useRef(null);
 
  useEffect(() => {
- if (item && item.userId) {
- if (user && user.uid !== item.userId) {
- connectionService.getConnection(user.uid, item.userId).then((res) => {
+ if (item && itemUserId) {
+ if (user && user.uid !== itemUserId) {
+ connectionService.getConnection(user.uid, itemUserId).then((res) => {
  if (res.data) {
  setConnectionStatus(res.data.status);
  } else {
@@ -64,12 +66,18 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  setConnectionStatus(null);
  }
  }
+ 
+ if (item && profile?.savedItems) {
+   setIsSaved(profile.savedItems.includes(item.id));
+ } else {
+   setIsSaved(false);
+ }
+
  // Reset local state on item change
  setShowDebate(false);
  setDebateComments([]);
  setDebateInput('');
- setIsSaved(false);
- }, [item, user]);
+ }, [item, user, profile, itemUserId]);
 
  useEffect(() => {
  if (showDebate && debateRef.current) {
@@ -84,7 +92,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  const defaultNote = `Hi ${item.authorName || 'there'}! I saw your ${isIdea ? 'idea' : 'project'}"${item.title}" and would love to connect.`;
  const finalNote = connectNote.trim() || defaultNote;
  
- const res = await connectionService.sendRequest(user.uid, item.userId, finalNote);
+ const res = await connectionService.sendRequest(user.uid, itemUserId, finalNote);
  if (!res.error) {
  setConnectionStatus('pending');
  setShowConnectForm(false);
@@ -101,11 +109,11 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
 
  const handleCollab = async () => {
  if (!user || isCollabbing) return;
- if (user.uid === item.userId) { toast.error('This is your own item!'); return; }
+ if (user.uid === itemUserId) { toast.error('This is your own item!'); return; }
  setIsCollabbing(true);
  try {
  const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'}"${item.title}".`;
- const res = await connectionService.sendRequest(user.uid, item.userId, note);
+ const res = await connectionService.sendRequest(user.uid, itemUserId, note);
  if (!res?.error) {
  toast.success('Collaboration request sent!');
  } else {
@@ -116,6 +124,19 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  } finally {
  setIsCollabbing(false);
  }
+ };
+
+ const handleToggleSave = async () => {
+   if (!user || !item) return;
+   const currentlySaved = isSaved;
+   setIsSaved(!currentlySaved);
+   try {
+     await userService.toggleSavedItem(user.uid, item.id);
+     toast.success(currentlySaved ? 'Removed from saved' : '✓ Saved!');
+   } catch (err) {
+     setIsSaved(currentlySaved);
+     toast.error('Failed to save item');
+   }
  };
 
  const handleAddDebateComment = () => {
@@ -135,7 +156,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  };
 
  const handleConfirmDelete = async () => {
- if (!user || !item || user.uid !== item.userId || isDeleting) return;
+ if (!user || !item || user.uid !== itemUserId || isDeleting) return;
  
  setIsDeleting(true);
  try {
@@ -157,7 +178,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  }
  };
 
- const isOwnItem = user && item && user.uid === item.userId;
+ const isOwnItem = user && item && user.uid === itemUserId;
 
  const footer = (
  <div className="flex flex-col gap-3 w-full">
@@ -165,7 +186,7 @@ export default function ViewDetailsModal({ open, onClose, item, type }) {
  {user && !isOwnItem && (
  <div className="grid grid-cols-3 gap-2">
  <button
- onClick={() => { setIsSaved(s => !s); toast(isSaved ? 'Removed from saved' : '✓ Saved!'); }}
+ onClick={handleToggleSave}
  className={cn(
 "flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold border transition-all duration-200",
  isSaved

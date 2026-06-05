@@ -42,6 +42,7 @@ export default function Discover() {
  const { user, profile } = useAuth();
  const [debateItem, setDebateItem] = useState(null);
  const [savedItems, setSavedItems] = useState(new Set());
+ const [collabStatus, setCollabStatus] = useState({});
 
  // Update savedItems when user changes
  useEffect(() => {
@@ -49,6 +50,33 @@ export default function Discover() {
  setSavedItems(new Set(profile.savedItems));
  }
  }, [profile?.savedItems]);
+
+ useEffect(() => {
+   if (!user) {
+     setCollabStatus({});
+     return;
+   }
+   const fetchConnections = async () => {
+     const [connRes, sentRes] = await Promise.all([
+       connectionService.getUserConnections(user.uid),
+       connectionService.getSentRequests(user.uid)
+     ]);
+     const statusMap = {};
+     if (connRes.data) {
+       connRes.data.forEach(c => {
+         const otherId = c.fromUserId === user.uid ? c.toUserId : c.fromUserId;
+         statusMap[otherId] = 'accepted';
+       });
+     }
+     if (sentRes.data) {
+       sentRes.data.forEach(req => {
+         statusMap[req.toUserId] = 'pending';
+       });
+     }
+     setCollabStatus(statusMap);
+   };
+   fetchConnections();
+ }, [user]);
 
  const handleAddItem = async (e, item) => {
  e.stopPropagation();
@@ -76,11 +104,15 @@ export default function Discover() {
  const handleCollab = async (e, item) => {
  e.stopPropagation();
  if (!user) { toast.error('Sign in to collaborate'); return; }
- if (user.uid === (item.userId || item.authorId)) { toast.error('This is your own item!'); return; }
+ const itemUserId = item.userId || item.authorId;
+ if (user.uid === itemUserId) { toast.error('This is your own item!'); return; }
  try {
  const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${activeTab === 'ideas' ? 'idea' : 'project'}"${item.title}".`;
- const res = await connectionService.sendRequest(user.uid, item.userId || item.authorId, note);
- if (!res?.error) { toast.success('Collaboration request sent!'); }
+ const res = await connectionService.sendRequest(user.uid, itemUserId, note);
+ if (!res?.error) { 
+   toast.success('Collaboration request sent!');
+   setCollabStatus(prev => ({ ...prev, [itemUserId]: 'pending' }));
+ }
  else { toast.error(res.error); }
  } catch { toast.error('Failed to send request'); }
  };
@@ -427,7 +459,7 @@ export default function Discover() {
  </div>
 
  {/* Action buttons */}
- {user && user.uid !== item.userId && (
+ {user && user.uid !== (item.userId || item.authorId) && (
  <div className="grid grid-cols-3 gap-1.5">
  <button
  onClick={(e) => handleAddItem(e, item)}
@@ -448,9 +480,17 @@ export default function Discover() {
  </button>
  <button
  onClick={(e) => handleCollab(e, item)}
- className="flex items-center justify-center gap-1.5 h-8 rounded-lg text-[11px] font-bold border bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-200"
+ disabled={collabStatus[item.userId || item.authorId] === 'accepted' || collabStatus[item.userId || item.authorId] === 'pending'}
+ className={cn(
+   "flex items-center justify-center gap-1.5 h-8 rounded-lg text-[11px] font-bold border transition-all duration-200",
+   collabStatus[item.userId || item.authorId] === 'accepted'
+     ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+     : collabStatus[item.userId || item.authorId] === 'pending'
+     ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
+     : "bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+ )}
  >
- <Handshake size={12} /> Collab
+ <Handshake size={12} /> {collabStatus[item.userId || item.authorId] === 'accepted' ? "Collab'd" : collabStatus[item.userId || item.authorId] === 'pending' ? 'Pending' : 'Collab'}
  </button>
  </div>
  )}
