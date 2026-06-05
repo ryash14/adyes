@@ -1,9 +1,9 @@
 /**
- * Firebase Storage — profile photos, resumes, message attachments
+ * Supabase Storage — profile photos, resumes, message attachments
+ * Replaces Firebase storage for easier setup and free tier
  */
 
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 
 class StorageService {
   /**
@@ -11,26 +11,27 @@ class StorageService {
    */
   async _upload(bucket, path, file, onProgress) {
     try {
-      const storageRef = ref(storage, `${bucket}/${path}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      // Supabase standard js client does not support progress tracking
+      // We simulate a basic 0 -> 50 -> 100 progress for UI feedback
+      onProgress?.(10);
+      
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+        
+      onProgress?.(80);
 
-      return new Promise((resolve, reject) => {
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            onProgress?.(progress);
-          },
-          (error) => {
-            console.error('[Storage] Upload error:', error);
-            reject(error);
-          },
-          async () => {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(downloadURL);
-          }
-        );
-      });
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path);
+
+      onProgress?.(100);
+      return publicUrl;
     } catch (err) {
       console.error('[Storage] Upload error:', err);
       throw err;
@@ -104,10 +105,10 @@ class StorageService {
   _friendlyError(error) {
     const msg = error?.message?.toLowerCase() || '';
     if (msg.includes('bucket not found') || msg.includes('not exist')) {
-      return 'Storage bucket not configured. Please check your storage settings.';
+      return 'Storage bucket not configured in Supabase. Please create the bucket.';
     }
-    if (msg.includes('unauthorized') || msg.includes('policy') || msg.includes('permission_denied')) {
-      return 'Permission denied. You do not have access to upload here.';
+    if (msg.includes('row-level security') || msg.includes('policy')) {
+      return 'Permission denied. Check Supabase bucket policies.';
     }
     return error?.message || 'Upload failed. Please try again.';
   }
