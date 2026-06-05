@@ -68,38 +68,38 @@
     --input: #E4E4E7;
     --ring: #2563EB;
 
-    --radius: 12px;
+    --radius: 8px;
   }
 
   .dark {
-    /* UI/UX Pro Max Dark Theme (Premium Dark + Neon) */
+    /* Bespoke Vercel-Style Dark Theme */
     --background: #000000;
-    --foreground: #FAFAF9;
+    --foreground: #EDEDED;
 
-    --card: #0C0A09;
-    --card-foreground: #FAFAF9;
+    --card: #0A0A0A;
+    --card-foreground: #EDEDED;
 
-    --popover: #0C0A09;
-    --popover-foreground: #FAFAF9;
+    --popover: #0A0A0A;
+    --popover-foreground: #EDEDED;
 
-    --primary: #FAFAF9;
+    --primary: #FFFFFF;
     --primary-foreground: #000000;
 
-    --secondary: #1C1917;
-    --secondary-foreground: #FAFAF9;
+    --secondary: #111111;
+    --secondary-foreground: #EDEDED;
 
-    --muted: #1C1917;
-    --muted-foreground: #A8A29E;
+    --muted: #111111;
+    --muted-foreground: #A1A1AA;
 
-    --accent: #CCFF00;
+    --accent: #FFFFFF; /* Stark white accent for a minimal look */
     --accent-foreground: #000000;
 
-    --destructive: #7F1D1D;
-    --destructive-foreground: #FEF2F2;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
 
-    --border: #292524;
-    --input: #292524;
-    --ring: #CCFF00;
+    --border: #1F1F1F;
+    --input: #1F1F1F;
+    --ring: #FFFFFF;
   }
 }
 
@@ -152,13 +152,13 @@
 }
 
 @layer components {
-  /* UI/UX Pro Max Glassmorphism & Cards */
+  /* Ultra-Premium Glass & Cards */
   .glass-panel {
-    @apply bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-xl;
+    @apply bg-background/80 backdrop-blur-xl border border-border shadow-sm;
   }
   
   .glass-card {
-    @apply bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-xl rounded-xl p-6 transition-all duration-300 hover:shadow-2xl hover:bg-white/5;
+    @apply bg-card/60 backdrop-blur-xl border border-white/[0.04] rounded-xl p-6 transition-all duration-300 hover:bg-white/[0.02] hover:border-white/[0.08];
   }
   
   .surface {
@@ -176,7 +176,7 @@
 
   
   .panel-soft {
-    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-xl dark:bg-zinc-900/40 dark:border-white/10 dark:shadow-2xl rounded-2xl p-6;
+    @apply bg-white border border-border shadow-sm dark:bg-[#0A0A0A] dark:border-white/[0.04] dark:shadow-md rounded-2xl p-6;
   }
 
   /* Interactive Buttons */

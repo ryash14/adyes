@@ -118,6 +118,35 @@ class UserService {
   }
 
   /**
+   * Toggle a saved item for a user
+   */
+  async toggleSavedItem(userId, itemId) {
+    try {
+      const userRef = doc(db, this.collectionName, userId);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) return { error: 'User not found' };
+      
+      const data = userSnap.data();
+      const savedItems = data.savedItems || [];
+      const isSaved = savedItems.includes(itemId);
+      
+      const newSavedItems = isSaved 
+        ? savedItems.filter(id => id !== itemId)
+        : [...savedItems, itemId];
+        
+      await updateDoc(userRef, {
+        savedItems: newSavedItems,
+        updatedAt: serverTimestamp()
+      });
+      
+      return { data: newSavedItems, isSaved: !isSaved, error: null };
+    } catch (error) {
+      console.error('Error toggling saved item:', error);
+      return { error: error.message };
+    }
+  }
+
+  /**
    * Search users by various criteria
    */
   async searchUsers(searchTerm, filters = {}) {
