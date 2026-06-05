@@ -121,23 +121,27 @@ class UserService {
    * Toggle a saved item for a user
    */
   async toggleSavedItem(userId, itemId) {
+    if (!itemId) return { error: 'Invalid item ID' };
     try {
       const userRef = doc(db, this.collectionName, userId);
       const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return { error: 'User not found' };
       
-      const data = userSnap.data();
-      const savedItems = data.savedItems || [];
+      let savedItems = [];
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        savedItems = data.savedItems || [];
+      }
+      
       const isSaved = savedItems.includes(itemId);
       
       const newSavedItems = isSaved 
         ? savedItems.filter(id => id !== itemId)
         : [...savedItems, itemId];
         
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         savedItems: newSavedItems,
         updatedAt: serverTimestamp()
-      });
+      }, { merge: true });
       
       return { data: newSavedItems, isSaved: !isSaved, error: null };
     } catch (error) {
