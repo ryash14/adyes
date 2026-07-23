@@ -7,21 +7,21 @@ import { ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 const SIMILARITY_THRESHOLD = 0.20;
 
 async function checkOriginality(title, description) {
- try {
- const query = `${title} ${description}`;
- const response = await fetch('https://collabhub-dmnz.onrender.com/api/search', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query, type: 'ideas', top_k: 3 }),
- });
- if (!response.ok) return { certified: true, score: 0 };
- const data = await response.json();
- const topScore = data.results?.[0]?.score ?? 0;
- return { certified: topScore < SIMILARITY_THRESHOLD, score: topScore };
- } catch {
- // If API is down, don't block submission
- return { certified: true, score: 0 };
- }
+  try {
+    const query = `${title} ${description}`;
+    const response = await fetch('https://collabhub-dmnz.onrender.com/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, type: 'ideas', top_k: 3 }),
+    });
+    if (!response.ok) return { certified: true, score: 0 };
+    const data = await response.json();
+    const topScore = data.results?.[0]?.score ?? 0;
+    return { certified: topScore < SIMILARITY_THRESHOLD, score: topScore };
+  } catch {
+    // If API is down, don't block submission
+    return { certified: true, score: 0 };
+  }
 }
 
 export default function ContentModal({ open, onClose, type, item, userId, authorName, onSaved }) {

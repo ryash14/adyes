@@ -19,7 +19,7 @@ import {
   startAfter,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { semanticSearchService } from './semanticSearch';
+import semanticSearchService from './semanticSearch';
 
 class ContentService {
   /**
@@ -42,12 +42,16 @@ class ContentService {
         updatedAt: serverTimestamp(),
       });
       
-      // 2. Sync to Semantic Search
-      try {
-        await semanticSearchService.submitContent('ideas', { ...finalData, id: docRef.id });
-      } catch (err) {
-        console.warn('Semantic search API sync failed, but saved to Firebase successfully', err);
-      }
+      // 2. Sync with Semantic Search backend (non-blocking)
+      semanticSearchService.submitContent('idea', {
+        id: docRef.id,
+        title: finalData.title,
+        description: finalData.description,
+        tags: finalData.tags || [],
+        userId: userId,
+        authorName: finalData.authorName || 'Anonymous',
+        category: finalData.category || ''
+      }).catch(err => console.warn('Failed to index idea for search:', err));
       
       return { data: { id: docRef.id }, error: null };
     } catch (error) {
@@ -76,12 +80,16 @@ class ContentService {
         updatedAt: serverTimestamp(),
       });
       
-      // 2. Sync to Semantic Search
-      try {
-        await semanticSearchService.submitContent('projects', { ...finalData, id: docRef.id });
-      } catch (err) {
-        console.warn('Semantic search API sync failed, but saved to Firebase successfully', err);
-      }
+      // 2. Sync with Semantic Search backend (non-blocking)
+      semanticSearchService.submitContent('project', {
+        id: docRef.id,
+        title: finalData.title,
+        description: finalData.description,
+        tags: finalData.tags || [],
+        userId: userId,
+        authorName: finalData.authorName || 'Anonymous',
+        category: finalData.category || ''
+      }).catch(err => console.warn('Failed to index project for search:', err));
       
       return { data: { id: docRef.id }, error: null };
     } catch (error) {
@@ -278,6 +286,19 @@ class ContentService {
       });
 
       const result = await this.getIdea(ideaId);
+      
+      if (result.data) {
+        semanticSearchService.submitContent('idea', {
+          id: ideaId,
+          title: result.data.title,
+          description: result.data.description,
+          tags: result.data.tags || [],
+          userId: result.data.userId,
+          authorName: result.data.authorName || 'Anonymous',
+          category: result.data.category || ''
+        }).catch(err => console.warn('Failed to update idea in search index:', err));
+      }
+      
       return result;
     } catch (error) {
       console.error('Error updating idea:', error);
@@ -297,6 +318,19 @@ class ContentService {
       });
 
       const result = await this.getProject(projectId);
+      
+      if (result.data) {
+        semanticSearchService.submitContent('project', {
+          id: projectId,
+          title: result.data.title,
+          description: result.data.description,
+          tags: result.data.tags || [],
+          userId: result.data.userId,
+          authorName: result.data.authorName || 'Anonymous',
+          category: result.data.category || ''
+        }).catch(err => console.warn('Failed to update project in search index:', err));
+      }
+      
       return result;
     } catch (error) {
       console.error('Error updating project:', error);
@@ -342,19 +376,9 @@ class ContentService {
    */
   async deleteIdea(ideaId) {
     try {
-      try {
-        await semanticSearchService.deleteContent('ideas', ideaId);
-      } catch (err) {
-        console.warn('Failed to delete idea from semantic search API:', err);
-      }
-      
-      try {
-        const ideaRef = doc(db, 'ideas', ideaId);
-        await deleteDoc(ideaRef);
-      } catch (err) {
-        console.warn('Client-side Firebase delete ignored (likely handled by backend):', err);
-      }
-      
+      const ideaRef = doc(db, 'ideas', ideaId);
+      await deleteDoc(ideaRef);
+      semanticSearchService.deleteContent('idea', ideaId).catch(err => console.warn('Failed to delete idea from search index', err));
       return { error: null };
     } catch (error) {
       console.error('Error deleting idea:', error);
@@ -367,19 +391,9 @@ class ContentService {
    */
   async deleteProject(projectId) {
     try {
-      try {
-        await semanticSearchService.deleteContent('projects', projectId);
-      } catch (err) {
-        console.warn('Failed to delete project from semantic search API:', err);
-      }
-      
-      try {
-        const projectRef = doc(db, 'projects', projectId);
-        await deleteDoc(projectRef);
-      } catch (err) {
-        console.warn('Client-side Firebase delete ignored (likely handled by backend):', err);
-      }
-      
+      const projectRef = doc(db, 'projects', projectId);
+      await deleteDoc(projectRef);
+      semanticSearchService.deleteContent('project', projectId).catch(err => console.warn('Failed to delete project from search index', err));
       return { error: null };
     } catch (error) {
       console.error('Error deleting project:', error);

@@ -59,6 +59,9 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: true,
     },
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
   },
   optimizeDeps: {
     // Pre-bundle dependencies

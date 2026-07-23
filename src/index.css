@@ -1,12 +1,12 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;900&display=swap');
 @config "../tailwind.config.js";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 
   --color-border: var(--border);
   --color-input: var(--input);
@@ -40,7 +40,7 @@
 @layer base {
   :root {
     /* UI/UX Pro Max Light Theme (Premium Light) */
-    --background: #FAFAFA;
+    --background: #FFFFFF;
     --foreground: #09090B;
 
     --card: #FFFFFF;
@@ -58,7 +58,7 @@
     --muted: #F4F4F5;
     --muted-foreground: #71717A;
 
-    --accent: #10B981; /* Consistent Green for light mode */
+    --accent: #10B981; 
     --accent-foreground: #FFFFFF;
 
     --destructive: #EF4444;
@@ -72,34 +72,34 @@
   }
 
   .dark {
-    /* Bespoke Vercel-Style Dark Theme */
+    /* TRUE BLACK PREMIUM DARK THEME */
     --background: #000000;
-    --foreground: #EDEDED;
+    --foreground: #FAFAFA;
 
     --card: #0A0A0A;
-    --card-foreground: #EDEDED;
+    --card-foreground: #FAFAFA;
 
     --popover: #0A0A0A;
-    --popover-foreground: #EDEDED;
+    --popover-foreground: #FAFAFA;
 
     --primary: #FFFFFF;
     --primary-foreground: #000000;
 
     --secondary: #111111;
-    --secondary-foreground: #EDEDED;
+    --secondary-foreground: #FAFAFA;
 
     --muted: #111111;
     --muted-foreground: #A1A1AA;
 
-    --accent: #FFFFFF; /* Stark white accent for a minimal look */
-    --accent-foreground: #000000;
+    --accent: #4F46E5; /* Sophisticated Indigo */
+    --accent-foreground: #FFFFFF;
 
     --destructive: #EF4444;
     --destructive-foreground: #FFFFFF;
 
     --border: #1F1F1F;
     --input: #1F1F1F;
-    --ring: #FFFFFF;
+    --ring: #4F46E5;
   }
 }
 
@@ -107,22 +107,35 @@
   * {
     @apply border-border;
   }
+  
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-accent selection:text-white dark:selection:text-black;
-    background-image: 
-      linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-accent/30 selection:text-white dark:selection:text-white;
   }
   
-  .dark body {
-    background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-  }
+  /* Clean background — no noise overlay */
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+    @apply font-display tracking-tight font-semibold;
   }
 }
 
@@ -135,7 +148,6 @@
     scrollbar-width: none;
   }
 
-  /* Custom Scrollbar Theme Sync */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -152,7 +164,6 @@
 }
 
 @layer components {
-  /* Ultra-Premium Glass & Cards */
   .glass-panel {
     @apply bg-background/80 backdrop-blur-xl border border-border shadow-sm;
   }
@@ -169,17 +180,14 @@
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer;
   }
 
-  /* Sharp inputs */
   .input {
     @apply flex h-12 w-full rounded-lg border border-input bg-zinc-900/50 backdrop-blur-sm px-4 py-2 text-base transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 text-foreground placeholder:text-muted-foreground;
   }
 
-  
   .panel-soft {
     @apply bg-white border border-border shadow-sm dark:bg-[#0A0A0A] dark:border-white/[0.04] dark:shadow-md rounded-2xl p-6;
   }
 
-  /* Interactive Buttons */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 h-10 px-5 py-2 cursor-pointer relative overflow-hidden;
   }
@@ -209,10 +217,6 @@
     @apply border border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-secondary/80 hover:text-foreground shadow-sm;
   }
 
-  /* Sharp inputs */
-  .input {
-    @apply flex h-10 w-full rounded-lg border border-input bg-background/50 backdrop-blur-sm px-3 py-2 text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50;
-  }
   .textarea {
     @apply flex min-h-[80px] w-full rounded-lg border border-input bg-background/50 backdrop-blur-sm px-3 py-2 text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50;
   }
@@ -221,15 +225,14 @@
     @apply mx-auto max-w-[1200px] px-6 md:px-8;
   }
 
-  /* Typography extensions */
   .section-title {
     @apply text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4;
   }
+  
   .eyebrow {
     @apply text-xs font-bold uppercase tracking-[0.2em] text-primary mb-3 block;
   }
 
-  /* Auth Pages (Replacement for auth-premium.css) */
   .pub-auth {
     @apply min-h-screen flex items-center justify-center relative bg-background overflow-y-auto;
   }
@@ -325,15 +328,6 @@
 }
 
 @layer utilities {
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Custom Loader */
   .loader {
     position: relative;
     width: 120px;
@@ -386,4 +380,31 @@
               -70px 90px 0 rgba(0,0,0,0);
     }
   }
+
+   @keyframes auth-orb-1 {
+     0%, 100% { transform: translate(0, 0) scale(1); }
+     25% { transform: translate(30px, -20px) scale(1.05); }
+     50% { transform: translate(-20px, 30px) scale(0.95); }
+     75% { transform: translate(10px, 10px) scale(1.02); }
+   }
+   @keyframes auth-orb-2 {
+     0%, 100% { transform: translate(0, 0) scale(1); }
+     25% { transform: translate(-20px, 20px) scale(1.03); }
+     50% { transform: translate(25px, -15px) scale(0.97); }
+     75% { transform: translate(-10px, -25px) scale(1.05); }
+   }
+   .animate-auth-orb-1 {
+     animation: auth-orb-1 20s ease-in-out infinite;
+   }
+   .animate-auth-orb-2 {
+     animation: auth-orb-2 25s ease-in-out infinite;
+   }
+
+   @keyframes fade-in {
+     from { opacity: 0; transform: translateY(8px); }
+     to { opacity: 1; transform: translateY(0); }
+   }
+   .animate-fade-in {
+     animation: fade-in 0.5s ease-out;
+   }
 }

@@ -9,7 +9,7 @@ export default function AuthStage() {
  <div className="pub-stage__brand-mark transition-transform group-hover:rotate-12">
  <Command size={18} strokeWidth={2.5} />
  </div>
- CollabHub
+ adyes
  </Link>
 
  <p className="pub-stage__kicker">Collaboration studio</p>
@@ -17,9 +17,9 @@ export default function AuthStage() {
  Your calm workspace for serious delivery.
  </h1>
 
- <p className="pub-stage__lead">
- Build with people who keep momentum. CollabHub makes every decision, update, and message feel intentional.
- </p>
+ <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-sm">
+        Build with people who keep momentum. adyes makes every decision, update, and message feel intentional.
+      </p>
 
  <div className="pub-stage__stats">
  {[

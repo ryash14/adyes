@@ -65,54 +65,51 @@ export default function AppShell({ children, fullBleed = false }) {
  {/* Top Navigation Bar */}
  <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl transition-all">
  <div className="flex h-16 items-center justify-between px-4 md:px-6">
- 
- {/* Left: Logo & Desktop Links */}
- <div className="flex items-center gap-6">
- {/* Mobile Menu Toggle */}
- <button
- type="button"
- onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
- className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
- >
- {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
- </button>
+      {/* Left: Logo */}
+      <div className="flex items-center w-auto md:w-[200px]">
+        {/* Mobile Menu Toggle */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors mr-2"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
 
- {/* Logo */}
- <Link
- to="/"
- className="flex items-center gap-2 text-base font-black uppercase tracking-widest group"
- >
- <div className="h-8 w-8 bg-foreground text-background rounded-lg flex items-center justify-center shadow-md group-hover:bg-accent group-hover:text-black transition-colors">
- <Command size={16} strokeWidth={2.5} />
- </div>
- <span className="hidden sm:inline-block group-hover:text-accent transition-colors">Hub.</span>
- </Link>
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center text-xl font-black tracking-tight group"
+        >
+          <span className="text-foreground transition-colors duration-300">ad</span>
+          <span className="text-accent transition-colors duration-300 group-hover:text-emerald-400">yes</span>
+        </Link>
+      </div>
 
- {/* Desktop Nav Links */}
- <nav className="hidden md:flex items-center gap-1 ml-4">
- {NAV_ITEMS.map((item) => {
- const active = isActive(item.path);
- return (
- <Link
- key={item.path}
- to={item.path}
- className={cn(
-"px-3 py-2 rounded-md text-sm font-semibold transition-colors flex items-center gap-2",
- active 
- ?"bg-secondary text-foreground" 
- :"text-muted-foreground hover:text-foreground hover:bg-secondary/50"
- )}
- >
- <item.icon size={16} strokeWidth={active ? 2.5 : 2} />
- {item.label}
- </Link>
- );
- })}
- </nav>
- </div>
+      {/* Middle: Desktop Nav Links */}
+      <nav className="hidden md:flex flex-1 justify-center items-center gap-1">
+        {NAV_ITEMS.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "px-3 py-2 rounded-md text-sm font-semibold transition-colors flex items-center gap-2",
+                active 
+                  ? "bg-secondary text-foreground" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              )}
+            >
+              <item.icon size={16} strokeWidth={active ? 2.5 : 2} />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
 
- {/* Right: Actions & Profile */}
- <div className="flex items-center gap-3">
+      {/* Right: Actions & Profile */}
+      <div className="flex items-center justify-end w-auto md:w-[200px] gap-3">
  <div className="hidden sm:flex items-center gap-3 pr-2 border-r border-border">
  <ThemeToggle />
  <NotificationCenter placement="below" />

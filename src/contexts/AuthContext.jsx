@@ -63,17 +63,6 @@ export const AuthProvider = ({ children }) => {
  window.addEventListener('blur', handleBlur);
  window.addEventListener('beforeunload', handleBlur);
 
- // Handle OAuth redirect result
- const checkRedirect = async () => {
- const result = await authService.handleRedirectResult();
- if (result.error) {
- toast.error(result.error);
- } else if (result.user) {
- toast.success('Welcome!');
- }
- };
- checkRedirect();
-
  return () => {
  unsubscribe();
  window.removeEventListener('focus', handleFocus);
@@ -103,21 +92,27 @@ export const AuthProvider = ({ children }) => {
  }, []);
 
  const signInWithGoogle = useCallback(async () => {
- const { error } = await authService.signInWithGoogle();
+ const { user: firebaseUser, error } = await authService.signInWithGoogle();
  if (error) {
  toast.error(error);
- return { error };
+ return { user: null, error };
  }
- return { error: null };
+ if (firebaseUser) {
+ toast.success('Welcome!');
+ }
+ return { user: firebaseUser, error: null };
  }, []);
 
  const signInWithGithub = useCallback(async () => {
- const { error } = await authService.signInWithGithub();
+ const { user: firebaseUser, error } = await authService.signInWithGithub();
  if (error) {
  toast.error(error);
- return { error };
+ return { user: null, error };
  }
- return { error: null };
+ if (firebaseUser) {
+ toast.success('Welcome!');
+ }
+ return { user: firebaseUser, error: null };
  }, []);
 
  const signOut = useCallback(async () => {

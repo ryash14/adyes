@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { contentService } from '../services/content.service';
 import { connectionService } from '../services/connection.service';
 import { userService } from '../services/user.service';
+import { semanticSearchService } from '../services/semanticSearch';
 import { Search, Sparkles, Rocket, Plus, Filter, Clock, Heart, ChevronLeft, ChevronRight, BookmarkPlus, MessageSquare, Handshake, ShieldCheck } from 'lucide-react';
 import AppShell from '../components/layout/AppShell';
 import { PageHeader } from '../components/layout/PageContainer';
@@ -188,34 +189,14 @@ export default function Discover() {
  const timer = setTimeout(async () => {
  setIsSearching(true);
  try {
- const response = await fetch('https://collabhub-dmnz.onrender.com/api/search', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- query: searchQuery,
- type: activeTab,
- top_k: 20
- })
- });
- if (response.ok) {
- const data = await response.json();
- // Fetch real firebase data for FAISS results to get accurate likes!
- const ids = data.results.map(r => r.id);
- const realDocs = await contentService.getDocumentsByIds(activeTab, ids);
+ const searchFn = activeTab === 'ideas'
+ ? semanticSearchService.searchIdeas.bind(semanticSearchService)
+ : semanticSearchService.searchProjects.bind(semanticSearchService);
  
- const realMap = {};
- if (realDocs.data) {
- realDocs.data.forEach(d => { realMap[d.id] = d; });
- }
- // Merge with FAISS but DO NOT filter out items missing from Firebase!
- // This ensures old demo items stored in FAISS are still visible.
- const merged = data.results.map(r => ({...r, ...(realMap[r.id] || {})}));
- setSemanticResults(merged);
- } else {
- setSemanticResults(null);
- }
+ const results = await searchFn(searchQuery, 20);
+ setSemanticResults(results);
  } catch (err) {
- console.warn('Semantic search failed, falling back to local filter:', err);
+ console.warn('Search failed, falling back to local filter:', err);
  setSemanticResults(null);
  } finally {
  setIsSearching(false);

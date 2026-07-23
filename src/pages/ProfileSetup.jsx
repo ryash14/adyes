@@ -1,15 +1,38 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { GraduationCap, Briefcase, Rocket, X, Code, MessageCircle, Link as LinkIcon } from 'lucide-react';
+import { GraduationCap, Briefcase, Rocket, X, Code, MessageCircle, Link as LinkIcon, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import AuthLayout from '../components/public/AuthLayout';
 import Badge from '../components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const STEP_TITLES = [
+ { title: 'Choose your path', lead: 'Select a role that best describes your current focus.' },
+ { title: 'Tell us about your work', lead: 'Provide context that helps others understand your background.' },
+ { title: 'Add your links', lead: 'Link your profiles to build trust with collaborators.' },
+];
+
+const stepVariants = {
+ enter: (direction) => ({
+ x: direction > 0 ? 80 : -80,
+ opacity: 0,
+ }),
+ center: {
+ x: 0,
+ opacity: 1,
+ },
+ exit: (direction) => ({
+ x: direction > 0 ? -80 : 80,
+ opacity: 0,
+ }),
+};
 
 export default function ProfileSetup() {
  const [step, setStep] = useState(1);
+ const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
  const [loading, setLoading] = useState(false);
  const [error, setError] = useState('');
  const [skillInput, setSkillInput] = useState('');
@@ -57,8 +80,22 @@ export default function ProfileSetup() {
  const { completeProfile, user } = useAuth();
  const navigate = useNavigate();
 
- const handleNext = () => setStep((s) => s + 1);
- const handleBack = () => setStep((s) => s - 1);
+ const canProceed = () => {
+ if (step === 1) return !!formData.role;
+ if (step === 2) return true; // Skills and bio are optional
+ return true;
+ };
+
+ const handleNext = () => {
+ if (!canProceed()) return;
+ setDirection(1);
+ setStep((s) => Math.min(s + 1, 3));
+ };
+
+ const handleBack = () => {
+ setDirection(-1);
+ setStep((s) => Math.max(s - 1, 1));
+ };
 
  const handleSkillKeyDown = (e) => {
  if (!showSkillDropdown) return;
@@ -122,7 +159,7 @@ export default function ProfileSetup() {
  setError('');
  const finalPayload = {
  ...formData,
- role: formData.role || 'user', // Default fallback so profile is complete
+ role: formData.role || 'student',
  github: '',
  linkedin: '',
  twitter: '',
@@ -139,7 +176,7 @@ export default function ProfileSetup() {
 
  const footerContent = (
  <div className="flex flex-col items-center gap-4 mt-2">
- {error && <span className="text-destructive font-medium bg-destructive/10 px-4 py-2 rounded-lg inline-block">{error}</span>}
+ {error && <span className="text-red-500 dark:text-red-400 font-medium bg-red-500/10 px-4 py-2 rounded-lg inline-block">{error}</span>}
  <button 
  type="button"
  onClick={handleSkip}
@@ -153,45 +190,72 @@ export default function ProfileSetup() {
  return (
  <AuthLayout
  eyebrow="Profile setup"
- title={step === 1 ? 'Choose your path' : step === 2 ? 'Tell us about your work' : 'Add your links'}
- lead={
- step === 1
- ? 'Select a role that best describes your current focus.'
- : step === 2
- ? 'Provide context that helps others understand your background.'
- : 'Link your profiles to build trust with collaborators.'
- }
+ title={STEP_TITLES[step - 1].title}
+ lead={STEP_TITLES[step - 1].lead}
  progress={{ current: step, total: 3 }}
  progressLabel="Onboarding"
  wide={true}
  footer={footerContent}
  >
- <div className="flex flex-col gap-8">
+ {/* Step indicators */}
+ <div className="flex items-center justify-center gap-2 mb-8">
+ {[1, 2, 3].map((s) => (
+ <div key={s} className="flex items-center gap-2">
+ <div className={cn(
+ "flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-300",
+ s < step ? "bg-emerald-500 text-white" :
+ s === step ? "bg-accent text-accent-foreground ring-4 ring-accent/20" :
+ "bg-secondary text-muted-foreground border border-border"
+ )}>
+ {s < step ? <CheckCircle2 size={16} /> : s}
+ </div>
+ {s < 3 && (
+ <div className={cn(
+ "w-12 h-0.5 rounded-full transition-all duration-500",
+ s < step ? "bg-emerald-500" : "bg-border"
+ )} />
+ )}
+ </div>
+ ))}
+ </div>
+
+ <AnimatePresence mode="wait" custom={direction}>
+ <motion.div
+ key={step}
+ custom={direction}
+ variants={stepVariants}
+ initial="enter"
+ animate="center"
+ exit="exit"
+ transition={{ duration: 0.3, ease: "easeInOut" }}
+ className="flex flex-col gap-8"
+ >
  {step === 1 && (
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
  {[
- { id: 'student', label: 'Student', icon: GraduationCap },
- { id: 'professional', label: 'Professional', icon: Briefcase },
- { id: 'entrepreneur', label: 'Entrepreneur', icon: Rocket },
+ { id: 'student', label: 'Student', icon: GraduationCap, desc: 'Learning & building' },
+ { id: 'professional', label: 'Professional', icon: Briefcase, desc: 'Working in industry' },
+ { id: 'entrepreneur', label: 'Entrepreneur', icon: Rocket, desc: 'Building a startup' },
  ].map((role) => (
  <button
  key={role.id}
  type="button"
  className={cn(
-"flex flex-col items-center justify-center gap-4 rounded-2xl border-2 px-4 py-8 text-sm font-bold uppercase tracking-wider transition-all duration-200",
+"flex flex-col items-center justify-center gap-3 rounded-2xl border-2 px-4 py-8 text-sm font-bold uppercase tracking-wider transition-all duration-200",
  formData.role === role.id
- ?"border-accent bg-accent/10 text-accent shadow-[4px_4px_0_0_#CCFF00] scale-[1.02]"
- :"border-border hover:border-accent/50 hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+ ?"border-accent bg-accent/10 text-accent shadow-lg shadow-accent/10 scale-[1.02]"
+ :"border-border hover:border-accent/50 hover:bg-secondary text-muted-foreground hover:text-foreground"
  )}
  onClick={() => setFormData({ ...formData, role: role.id })}
  >
  <div className={cn(
-"h-14 w-14 rounded-full flex items-center justify-center transition-colors",
- formData.role === role.id ?"bg-accent text-black" :"bg-zinc-800 text-muted-foreground"
+"h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200",
+ formData.role === role.id ?"bg-accent text-accent-foreground" :"bg-secondary text-muted-foreground"
  )}>
  <role.icon size={26} strokeWidth={2} />
  </div>
  <span>{role.label}</span>
+ <span className="text-[10px] font-medium text-muted-foreground normal-case tracking-normal">{role.desc}</span>
  </button>
  ))}
  </div>
@@ -210,19 +274,34 @@ export default function ProfileSetup() {
  </label>
 
  <div className="flex flex-col gap-2 relative">
+ <div className="flex items-center justify-between">
  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Skills and Interests</span>
+ {formData.skills.length > 0 && (
+ <span className="text-[10px] font-bold text-muted-foreground">{formData.skills.length}/10</span>
+ )}
+ </div>
  <div 
  className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-lg border-2 border-border bg-card backdrop-blur-sm focus-within:ring-2 focus-within:ring-accent focus-within:border-accent transition-all cursor-text"
  onClick={() => inputRef.current?.focus()}
  >
+ <AnimatePresence>
  {formData.skills.map((skill) => (
- <Badge key={skill} className="flex items-center gap-1.5 pr-1.5 py-1 text-sm bg-zinc-800 border-border text-foreground rounded-md px-2">
+ <motion.div
+ key={skill}
+ initial={{ opacity: 0, scale: 0.8 }}
+ animate={{ opacity: 1, scale: 1 }}
+ exit={{ opacity: 0, scale: 0.8 }}
+ transition={{ duration: 0.15 }}
+ >
+ <Badge className="flex items-center gap-1.5 pr-1.5 py-1 text-sm bg-secondary border-border text-foreground rounded-md px-2">
  {skill}
- <button type="button" className="rounded-full hover:bg-zinc-700 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
+ <button type="button" className="rounded-full hover:bg-muted p-1 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
  <X size={14} strokeWidth={2.5} className="text-muted-foreground hover:text-foreground" />
  </button>
  </Badge>
+ </motion.div>
  ))}
+ </AnimatePresence>
  <div className="flex-1 min-w-[120px]">
  <input
  ref={inputRef}
@@ -242,11 +321,10 @@ export default function ProfileSetup() {
  </div>
  </div>
 
- {/* Absolute Dropdown positioned relative to the entire"Skills and Interests" flex column */}
  {showSkillDropdown && (skillInput.trim() || filteredSkills.length > 0) && (
  <div className="absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto bg-card border border-border rounded-xl shadow-xl z-50 p-1 flex flex-col gap-1">
  {filteredSkills.length > 0 ? (
- filteredSkills.map((skill, index) => (
+ filteredSkills.slice(0, 15).map((skill, index) => (
  <button
  key={skill}
  type="button"
@@ -258,7 +336,7 @@ export default function ProfileSetup() {
  )}
  onMouseEnter={() => setHighlightedIndex(index)}
  onMouseDown={(e) => {
- e.preventDefault(); // prevent blur
+ e.preventDefault();
  addSkill(skill);
  }}
  >
@@ -275,7 +353,7 @@ export default function ProfileSetup() {
  addSkill(skillInput.trim());
  }}
  >
- Add"{skillInput.trim()}"
+ Add "{skillInput.trim()}"
  </button>
  )
  )}
@@ -302,7 +380,7 @@ export default function ProfileSetup() {
  <Code size={16} /> GitHub Username
  </label>
  <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-zinc-800 text-muted-foreground text-sm font-medium">
+ <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
  github.com/
  </div>
  <input
@@ -320,7 +398,7 @@ export default function ProfileSetup() {
  <Briefcase size={16} /> LinkedIn Username
  </label>
  <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-zinc-800 text-muted-foreground text-sm font-medium">
+ <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
  linkedin.com/in/
  </div>
  <input
@@ -338,7 +416,7 @@ export default function ProfileSetup() {
  <MessageCircle size={16} /> Twitter / X Username
  </label>
  <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-zinc-800 text-muted-foreground text-sm font-medium">
+ <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
  twitter.com/
  </div>
  <input
@@ -364,11 +442,13 @@ export default function ProfileSetup() {
  </div>
  </div>
  )}
- </div>
+ </motion.div>
+ </AnimatePresence>
 
  <div className="flex gap-4 pt-6 mt-8 border-t border-border">
  {step > 1 ? (
- <Button type="button" variant="secondary" className="flex-1" onClick={handleBack}>
+ <Button type="button" variant="secondary" className="flex-1 flex items-center justify-center gap-2" onClick={handleBack}>
+ <ArrowLeft size={16} />
  Back
  </Button>
  ) : (
@@ -379,21 +459,32 @@ export default function ProfileSetup() {
  <Button
  type="button"
  variant="primary"
- className="flex-1"
+ className="flex-1 flex items-center justify-center gap-2"
  onClick={handleNext}
- disabled={step === 1 && !formData.role}
+ disabled={!canProceed()}
  >
  Continue
+ <ArrowRight size={16} />
  </Button>
  ) : (
  <Button
  type="button"
  variant="primary"
- className="flex-1"
+ className="flex-1 flex items-center justify-center gap-2"
  onClick={handleSubmit}
  disabled={loading}
  >
- {loading ? 'Finishing...' : 'Complete Setup'}
+ {loading ? (
+ <span className="flex items-center gap-2">
+ <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+ Finishing...
+ </span>
+ ) : (
+ <>
+ <CheckCircle2 size={16} />
+ Complete Setup
+ </>
+ )}
  </Button>
  )}
  </div>

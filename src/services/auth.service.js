@@ -6,8 +6,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
   signOut as firebaseSignOut,
@@ -73,49 +72,57 @@ class AuthService {
   }
 
   /**
-   * Sign in with Google
+   * Sign in with Google (popup-based — no page reload)
    */
-   async signInWithGoogle() {
-     try {
-       await signInWithRedirect(auth, this.googleProvider);
-       return { error: null }; // The actual result is handled by handleRedirectResult on page load
-     } catch (error) {
+  async signInWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, this.googleProvider);
+      const oauthResult = await this.handleOAuthResult(result);
+      return oauthResult;
+    } catch (error) {
       console.error('Google sign in error:', error);
       
-      // Handle specific Firebase errors
       if (error.code === 'auth/configuration-not-found') {
         return { 
+          user: null,
           error: 'Google Sign-In is not configured. Please enable it in Firebase Console under Authentication > Sign-in method > Google.' 
         };
       }
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        return { user: null, error: null }; // User cancelled — not an error
+      }
       
-      return { error: this.handleAuthError(error) };
+      return { user: null, error: this.handleAuthError(error) };
     }
   }
 
-
   /**
-   * Sign in with GitHub
+   * Sign in with GitHub (popup-based — no page reload)
    */
-   async signInWithGithub() {
-     try {
-       await signInWithRedirect(auth, this.githubProvider);
-       return { error: null };
-     } catch (error) {
+  async signInWithGithub() {
+    try {
+      const result = await signInWithPopup(auth, this.githubProvider);
+      const oauthResult = await this.handleOAuthResult(result);
+      return oauthResult;
+    } catch (error) {
       console.error('GitHub sign in error:', error);
       
       if (error.code === 'auth/account-exists-with-different-credential') {
         return {
+          user: null,
           error: 'An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.'
         };
       }
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        return { user: null, error: null }; // User cancelled — not an error
+      }
       
-      return { error: this.handleAuthError(error) };
+      return { user: null, error: this.handleAuthError(error) };
     }
   }
 
   /**
-   * Handle the result of a redirect or popup sign-in
+   * Handle the result of a popup sign-in
    */
   async handleOAuthResult(result) {
     if (!result || !result.user) return { user: null, error: null };
@@ -126,7 +133,6 @@ class AuthService {
       // Check if user document exists, create if not
       const userDoc = await userService.getUser(user.uid);
       if (!userDoc.data) {
-        // We can check providerData to see if it was GitHub or Google
         const isGithub = result.providerId === 'github.com' || user.providerData[0]?.providerId === 'github.com';
         
         await userService.createUser(user.uid, {
@@ -144,19 +150,6 @@ class AuthService {
       return { user, error: null };
     } catch (error) {
       console.error('OAuth result handling error:', error);
-      return { user: null, error: this.handleAuthError(error) };
-    }
-  }
-
-  /**
-   * Handle the result of a redirect sign-in (legacy support if needed)
-   */
-  async handleRedirectResult() {
-    try {
-      const result = await getRedirectResult(auth);
-      return await this.handleOAuthResult(result);
-    } catch (error) {
-      console.error('Redirect sign in error:', error);
       return { user: null, error: this.handleAuthError(error) };
     }
   }

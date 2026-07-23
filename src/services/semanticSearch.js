@@ -1,199 +1,161 @@
 /**
  * Semantic Search Service
- * Handles all semantic search operations for ideas, projects, and profiles
+ * Connects to the Python Flask backend for FAISS vector search and indexing.
  */
 
-const SEMANTIC_SEARCH_BASE_URL = 'https://collabhub-dmnz.onrender.com';
+const API_BASE_URL = 'https://collabhub-dmnz.onrender.com/api';
 
 class SemanticSearchService {
   /**
-   * Search for profiles using semantic search
-   * @param {string} query - Search query
-   * @param {number} topK - Number of results to return
-   * @returns {Promise<Array>} - Array of profile results
+   * Search across a specific index
    */
-  async searchProfiles(query, topK = 20) {
+  async _search(query, type, topK = 10) {
     try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/search/profiles`, {
+      const response = await fetch(`${API_BASE_URL}/search`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, top_k: topK }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          type,
+          top_k: topK
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Semantic search request failed');
+        throw new Error(`Search API error: ${response.statusText}`);
       }
 
       const data = await response.json();
       return data.results || [];
     } catch (error) {
-      console.warn('Semantic profile search failed:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Search for ideas using semantic search
-   * @param {string} query - Search query
-   * @param {number} topK - Number of results to return
-   * @returns {Promise<Array>} - Array of idea results
-   */
-  async searchIdeas(query, topK = 20) {
-    try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, type: 'ideas', top_k: topK }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Semantic search request failed');
-      }
-
-      const data = await response.json();
-      return data.results || [];
-    } catch (error) {
-      console.warn('Semantic idea search failed:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Search for projects using semantic search
-   * @param {string} query - Search query
-   * @param {number} topK - Number of results to return
-   * @returns {Promise<Array>} - Array of project results
-   */
-  async searchProjects(query, topK = 20) {
-    try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, type: 'projects', top_k: topK }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Semantic search request failed');
-      }
-
-      const data = await response.json();
-      return data.results || [];
-    } catch (error) {
-      console.warn('Semantic project search failed:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Index a profile for semantic search
-   * @param {Object} profileData - Profile data to index
-   * @returns {Promise<boolean>} - Success status
-   */
-  async indexProfile(profileData) {
-    try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/index/profile`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Profile indexing failed');
-      }
-
-      return true;
-    } catch (error) {
-      console.warn('Profile indexing failed:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Submit a new idea or project
-   * @param {string} type - 'ideas' or 'projects'
-   * @param {Object} data - Idea/project data
-   * @returns {Promise<Object>} - Response with id
-   */
-  async submitContent(type, data) {
-    try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, type }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Content submission failed');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.warn('Content submission failed:', error);
+      console.error(`Error in semantic search for ${type}:`, error);
       throw error;
     }
   }
 
   /**
-   * Delete an idea or project
-   * @param {string} type - 'ideas' or 'projects'
-   * @param {string} id - Document ID
-   * @returns {Promise<boolean>} - Success status
+   * Search for profiles
    */
-  async deleteContent(type, id) {
-    try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, id }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Content deletion failed');
-      }
-
-      return true;
-    } catch (error) {
-      console.warn('Content deletion failed:', error);
-      return false;
-    }
+  async searchProfiles(queryText, topK = 10) {
+    return this._search(queryText, 'profiles', topK);
   }
 
   /**
-   * Get semantic search statistics
-   * @returns {Promise<Object>} - Statistics object
+   * Search for ideas
    */
-  async getStats() {
+  async searchIdeas(queryText, topK = 10) {
+    return this._search(queryText, 'ideas', topK);
+  }
+
+  /**
+   * Search for projects
+   */
+  async searchProjects(queryText, topK = 10) {
+    return this._search(queryText, 'projects', topK);
+  }
+
+  /**
+   * Add or update a profile in the search index
+   */
+  async indexProfile(profileData) {
     try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/api/stats`);
-      
+      const response = await fetch(`${API_BASE_URL}/profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
       if (!response.ok) {
-        throw new Error('Failed to fetch stats');
+        throw new Error(`Indexing API error: ${response.statusText}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.warn('Failed to fetch semantic search stats:', error);
-      return { ideas_count: 0, projects_count: 0, profiles_count: 0 };
+      console.error('Error indexing profile:', error);
+      return { success: false, error: error.message };
     }
   }
 
   /**
-   * Check if semantic search service is available
-   * @returns {Promise<boolean>} - Availability status
+   * Add or update content (ideas/projects) in the search index
+   */
+  async submitContent(type, data) {
+    try {
+      const endpoint = type === 'idea' ? 'ideas' : 'projects';
+      const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Content submission API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Error submitting ${type}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Delete content from the search index
+   */
+  async deleteContent(type, id) {
+    try {
+      const endpoint = type === 'idea' ? 'ideas' : 'projects';
+      const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Delete API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Get search statistics
+   */
+  async getStats() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats`);
+      
+      if (!response.ok) {
+        throw new Error(`Stats API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching search stats:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Health check to see if semantic search backend is available
    */
   async isAvailable() {
     try {
-      const response = await fetch(`${SEMANTIC_SEARCH_BASE_URL}/health`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(3000), // 3 second timeout
-      });
+      const response = await fetch(`${API_BASE_URL}/health`);
       return response.ok;
-    } catch {
+    } catch (error) {
       return false;
     }
   }
 }
 
-// Export singleton instance
 export const semanticSearchService = new SemanticSearchService();
 export default semanticSearchService;

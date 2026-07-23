@@ -1,37 +1,43 @@
 /**
- * Supabase Storage — profile photos, resumes, message attachments
- * Replaces Firebase storage for easier setup and free tier
+ * Firebase Storage — profile photos, resumes, message attachments
+ * Uses Firebase Storage (already configured in the project)
  */
 
-import { supabase } from '../lib/supabase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { storage } from '../lib/firebase';
 
 class StorageService {
   /**
-   * Core upload method
+   * Core upload method with progress tracking
    */
-  async _upload(bucket, path, file, onProgress) {
+  async _upload(folder, path, file, onProgress) {
     try {
-      // Supabase standard js client does not support progress tracking
-      // We simulate a basic 0 -> 50 -> 100 progress for UI feedback
-      onProgress?.(10);
-      
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .upload(path, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
-        
-      onProgress?.(80);
+      const storageRef = ref(storage, `${folder}/${path}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(path);
-
-      onProgress?.(100);
-      return publicUrl;
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            onProgress?.(progress);
+          },
+          (error) => {
+            console.error('[Storage] Upload error:', error);
+            reject(error);
+          },
+          async () => {
+            try {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            } catch (err) {
+              reject(err);
+            }
+          }
+        );
+      });
     } catch (err) {
       console.error('[Storage] Upload error:', err);
       throw err;
@@ -103,12 +109,17 @@ class StorageService {
 
   /** Convert errors to friendly messages */
   _friendlyError(error) {
+    const code = error?.code || '';
     const msg = error?.message?.toLowerCase() || '';
-    if (msg.includes('bucket not found') || msg.includes('not exist')) {
-      return 'Storage bucket not configured in Supabase. Please create the bucket.';
+    
+    if (code === 'storage/unauthorized' || msg.includes('permission')) {
+      return 'Permission denied. Check Firebase Storage rules.';
     }
-    if (msg.includes('row-level security') || msg.includes('policy')) {
-      return 'Permission denied. Check Supabase bucket policies.';
+    if (code === 'storage/canceled') {
+      return 'Upload cancelled.';
+    }
+    if (code === 'storage/quota-exceeded') {
+      return 'Storage quota exceeded.';
     }
     return error?.message || 'Upload failed. Please try again.';
   }
