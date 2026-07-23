@@ -22,7 +22,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#050608] text-slate-900 dark:text-white overflow-x-hidden selection:bg-[#FF6363]/20 font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden selection:bg-white/20 font-sans">
       <Navbar />
       <main>
         <HeroSection navigate={navigate} />
