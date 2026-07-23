@@ -130,17 +130,17 @@ export default function Network() {
  return (
  <AppShell>
  <div className="mb-10 max-w-7xl mx-auto">
- <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-secondary text-foreground text-xs font-semibold mb-4 tracking-wide shadow-sm">
- <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" /> Global Community
+ <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2a2a2a] bg-[#111111] text-[#888888] text-xs font-semibold mb-4 tracking-wide">
+ <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Global Community
  </div>
- <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Network</h1>
- <p className="text-muted-foreground mt-3 text-lg">Expand your circle, find co-founders, and manage your relationships.</p>
+ <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Network</h1>
+ <p className="text-[#888888] mt-3 text-lg">Expand your circle, find co-founders, and manage your relationships.</p>
  </div>
 
  <div className="space-y-10 max-w-7xl mx-auto">
  <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/10">
  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
- <TabsList className="grid w-full grid-cols-3 md:w-[450px] p-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-border rounded-xl shadow-sm">
+ <TabsList className="grid w-full grid-cols-3 md:w-[450px] p-1 bg-[#111111] border border-[#2a2a2a] rounded-xl">
  <TabsTrigger value="discover" className="flex items-center gap-2 font-semibold text-xs">
  <Users size={16} />
  Discover
@@ -192,7 +192,7 @@ export default function Network() {
  return (
  <div
  key={p.id}
- className="bg-card border border-border rounded-xl flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:border-muted-foreground/30 hover:bg-white/[0.02] relative overflow-hidden shadow-sm hover:shadow-md"
+ className="bg-[#111111] border border-[#222222] rounded-xl flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:border-emerald-500/30 hover:bg-emerald-500/5 relative overflow-hidden shadow-sm"
  onClick={() => navigate(`/profile/${p.id}`)}
  >
  <div className="p-6 w-full flex flex-col items-center">
@@ -211,9 +211,9 @@ export default function Network() {
  </div>
 
  <div className="space-y-1.5 mb-6 flex-1 w-full">
- <h3 className="text-base font-bold tracking-tight text-foreground line-clamp-2">{p.displayName}</h3>
- <p className="text-xs font-bold text-accent uppercase tracking-widest">{formatRole(p.role)}</p>
- <p className="text-xs text-muted-foreground">{p.college || 'Independent builder'}</p>
+ <h3 className="text-base font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors line-clamp-2">{p.displayName}</h3>
+ <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest">{formatRole(p.role)}</p>
+ <p className="text-xs text-[#888888]">{p.college || 'Independent builder'}</p>
 
  {activeTab === 'requests' && requests.find(r => r.fromUserId === p.id)?.note && (
  <div className="mt-3 p-3 bg-muted/60 rounded-xl text-left border border-border">

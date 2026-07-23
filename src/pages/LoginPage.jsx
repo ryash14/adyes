@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import AuthLayout from '../components/public/AuthLayout';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,31 +23,31 @@ const GithubIcon = () => (
 );
 
 export default function LoginPage() {
- const [email, setEmail] = useState('');
- const [password, setPassword] = useState('');
- const [loading, setLoading] = useState(false);
- const [providerLoading, setProviderLoading] = useState(null); // 'google' | 'github' | null
- const [error, setError] = useState('');
- const { signInWithEmail, signInWithGoogle, signInWithGithub } = useAuth();
- const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [providerLoading, setProviderLoading] = useState(null); // 'google' | 'github' | null
+  const [error, setError] = useState('');
+  const { loginWithEmail, signInWithGoogle, signInWithGithub } = useAuth();
+  const navigate = useNavigate();
 
- const handleEmailSignIn = async (e) => {
- e.preventDefault();
- setError('');
+  const handleEmailSignIn = async (e) => {
+    e.preventDefault();
+    setError('');
 
- if (!email || !password) {
- setError('Please fill in all fields');
- return;
- }
+    if (!email || !password) {
+      setError('Please enter your email and password');
+      return;
+    }
 
- setLoading(true);
- const result = await signInWithEmail(email, password);
- if (result.error) {
- setError(result.error);
- }
- // Navigation is handled by PublicRoute — onAuthStateChanged updates user state
- setLoading(false);
- };
+    setLoading(true);
+    const result = await loginWithEmail(email, password);
+    if (result.error) {
+      setError(result.error);
+    }
+    setLoading(false);
+  };
 
  const handleProviderSignIn = async (providerFn, providerName) => {
  setError('');
@@ -65,125 +65,128 @@ export default function LoginPage() {
  }
  };
 
- return (
- <AuthLayout
- eyebrow="Welcome back"
- title="Sign In"
- lead="Access your workspace."
- footer={
- <span>
- New to adyes?{' '}
- <Link to="/register" className="text-accent hover:underline font-bold transition-all">
- Create an account
- </Link>
- </span>
- }
- >
- <AnimatePresence>
- {error && (
- <motion.div
- initial={{ opacity: 0, y: -8, scale: 0.95 }}
- animate={{ opacity: 1, y: 0, scale: 1 }}
- exit={{ opacity: 0, y: -8, scale: 0.95 }}
- className="flex items-center gap-3 p-4 mb-6 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 text-sm font-semibold border border-red-500/20"
- >
- <AlertCircle size={16} className="shrink-0" />
- <span>{error}</span>
- </motion.div>
- )}
- </AnimatePresence>
+  return (
+    <AuthLayout
+      title="Welcome back"
+      footer={
+        <span>
+          Don't have an account?{' '}
+          <Link to="/register" className="text-white hover:underline transition-all">
+            Sign up
+          </Link>
+        </span>
+      }
+    >
+    <AnimatePresence>
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -8, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.95 }}
+          className="flex items-center gap-2 p-3 mb-6 rounded-xl bg-red-500/10 text-red-400 text-sm font-medium border border-red-500/20 backdrop-blur-sm"
+        >
+          <AlertCircle size={16} className="shrink-0" />
+          <span>{error}</span>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
- {/* OAuth Buttons Top */}
- <div className="grid grid-cols-2 gap-3 mb-6">
- <button
- type="button"
- onClick={() => handleProviderSignIn(signInWithGoogle, 'google')}
- disabled={providerLoading !== null}
- className="group relative flex items-center justify-center h-12 rounded-xl border border-border bg-white dark:bg-zinc-900 text-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:border-foreground/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
- >
- {providerLoading === 'google' ? (
- <Loader2 size={18} className="animate-spin text-muted-foreground" />
- ) : (
- <>
- <GoogleIcon />
- <span className="font-semibold text-sm">Google</span>
- </>
- )}
- </button>
- <button
- type="button"
- onClick={() => handleProviderSignIn(signInWithGithub, 'github')}
- disabled={providerLoading !== null}
- className="group relative flex items-center justify-center h-12 rounded-xl border border-border bg-white dark:bg-zinc-900 text-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:border-foreground/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
- >
- {providerLoading === 'github' ? (
- <Loader2 size={18} className="animate-spin text-muted-foreground" />
- ) : (
- <>
- <GithubIcon />
- <span className="font-semibold text-sm">GitHub</span>
- </>
- )}
- </button>
- </div>
+    {/* OAuth Buttons Top */}
+    <div className="flex flex-col gap-2 mb-4">
+      <button
+        type="button"
+        onClick={() => handleProviderSignIn(signInWithGoogle, 'google')}
+        disabled={providerLoading !== null}
+        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-zinc-800 bg-transparent text-white transition-all duration-200 hover:bg-zinc-800/50 hover:border-zinc-700 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+      >
+        {providerLoading === 'google' ? (
+          <Loader2 size={18} className="animate-spin text-zinc-400" />
+        ) : (
+          <>
+            <GoogleIcon />
+            <span className="font-medium text-[14px]">Continue with Google</span>
+          </>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={() => handleProviderSignIn(signInWithGithub, 'github')}
+        disabled={providerLoading !== null}
+        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-zinc-800 bg-transparent text-white transition-all duration-200 hover:bg-zinc-800/50 hover:border-zinc-700 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+      >
+        {providerLoading === 'github' ? (
+          <Loader2 size={18} className="animate-spin text-zinc-400" />
+        ) : (
+          <>
+            <GithubIcon />
+            <span className="font-medium text-[14px]">Continue with GitHub</span>
+          </>
+        )}
+      </button>
+    </div>
 
- <div className="relative flex py-4 items-center justify-center mb-6">
- <div className="absolute inset-x-0 top-1/2 border-t border-border -z-10" />
- <span className="bg-white dark:bg-zinc-900 px-4 relative z-10 text-[10px] font-bold uppercase tracking-widest text-muted-foreground rounded-full shadow-sm border border-border">
- Or continue with email
- </span>
- </div>
+    <div className="relative flex py-2 items-center justify-center mb-4">
+      <div className="absolute inset-x-0 top-1/2 border-t border-[#222222] -z-10" />
+      <span className="bg-[#111111] px-4 relative z-10 text-[13px] text-[#888888]">
+        or
+      </span>
+    </div>    <motion.form
+      onSubmit={handleEmailSignIn}
+      className="flex flex-col gap-2.5"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.4 }}
+    >
+      <label className="flex flex-col relative">
+        <Input
+          type="email"
+          placeholder="Enter email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4"
+        />
+      </label>
 
- <motion.form
- onSubmit={handleEmailSignIn}
- className="flex flex-col gap-4"
- initial={{ opacity: 0, y: 10 }}
- animate={{ opacity: 1, y: 0 }}
- transition={{ delay: 0.1, duration: 0.4 }}
- >
- <label className="flex flex-col gap-1.5 relative">
- <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</span>
- <Input
- type="email"
- placeholder="name@example.com"
- value={email}
- onChange={(e) => setEmail(e.target.value)}
- required
- className="h-11"
- />
- </label>
+      <label className="flex flex-col relative">
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4 pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] hover:text-white transition-colors"
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </label>
+      <div className="flex justify-end mb-2">
+        <Link to="/forgot-password" className="text-[12px] text-[#888888] hover:text-white transition-colors">
+          Forgot password?
+        </Link>
+      </div>
 
- <label className="flex flex-col gap-1.5 relative">
- <div className="flex items-center justify-between">
- <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Password</span>
- <Link to="/forgot-password" className="text-accent text-[10px] tracking-wider uppercase font-bold hover:underline">
- Forgot?
- </Link>
- </div>
- <Input
- type="password"
- placeholder="••••••••"
- value={password}
- onChange={(e) => setPassword(e.target.value)}
- required
- className="h-11"
- />
- </label>
+      <button
+        type="submit"
+        className="w-full h-11 bg-white text-black font-semibold text-[14px] rounded-full hover:bg-zinc-200 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
+        disabled={loading}
+      >
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <Loader2 size={16} className="animate-spin" />
+          </span>
+        ) : 'Continue'}
+      </button>
 
- <Button
- type="submit"
- variant="primary"
- className="w-full mt-2 h-11"
- disabled={loading}
- >
- {loading ? (
- <span className="flex items-center gap-2">
- <Loader2 size={16} className="animate-spin" />
- Signing in...
- </span>
- ) : 'Sign in'}
- </Button>
- </motion.form>
- </AuthLayout>
- );
+      <p className="text-[11px] text-[#888888] text-center mt-4">
+        By continuing, you agree to adyes's <span className="underline cursor-pointer hover:text-white">Terms</span> and <span className="underline cursor-pointer hover:text-white">Privacy</span>.
+      </p>
+    </motion.form>
+  </AuthLayout>
+  );
 }

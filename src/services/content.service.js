@@ -35,9 +35,13 @@ class ContentService {
       
       // 1. Save to Firebase FIRST
       const ideasRef = collection(db, 'ideas');
+      
+      const status = finalData.mentorId ? 'pending_mentor' : 'published';
+      
       const docRef = await addDoc(ideasRef, {
         ...finalData,
         type: 'idea',
+        status: status,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -117,6 +121,50 @@ class ContentService {
   }
 
   /**
+   * Get pending ideas for a specific mentor
+   */
+  async getPendingIdeasForMentor(mentorId, limitCount = 50) {
+    try {
+      const ideasRef = collection(db, 'ideas');
+      const q = query(
+        ideasRef,
+        where('mentorId', '==', mentorId),
+        where('status', '==', 'pending_mentor'),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+      );
+
+      const querySnapshot = await getDocs(q);
+      const ideas = [];
+      querySnapshot.forEach((doc) => {
+        ideas.push({ id: doc.id, ...doc.data() });
+      });
+
+      return { data: ideas, error: null };
+    } catch (error) {
+      console.error('Error getting pending ideas:', error);
+      return { data: [], error: error.message };
+    }
+  }
+
+  /**
+   * Update an idea's status (e.g. mentor accepts/rejects)
+   */
+  async updateIdeaStatus(ideaId, newStatus) {
+    try {
+      const ideaRef = doc(db, 'ideas', ideaId);
+      await updateDoc(ideaRef, {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+      });
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating idea status:', error);
+      return { error: error.message };
+    }
+  }
+
+  /**
    * Get project by ID
    */
   async getProject(projectId) {
@@ -187,7 +235,7 @@ class ContentService {
   }
 
   /**
-   * Get all ideas (for discovery)
+   * Get all ideas (for discovery) - Only returns published ideas
    */
   async getAllIdeas(limitCount = 20, lastDoc = null) {
     try {
@@ -195,7 +243,7 @@ class ContentService {
       let q = query(
         ideasRef,
         orderBy('createdAt', 'desc'),
-        limit(limitCount)
+        limit(limitCount * 2) // Fetch extra to account for filtered out items
       );
 
       if (lastDoc) {
@@ -203,15 +251,21 @@ class ContentService {
           ideasRef,
           orderBy('createdAt', 'desc'),
           startAfter(lastDoc),
-          limit(limitCount)
+          limit(limitCount * 2)
         );
       }
 
       const querySnapshot = await getDocs(q);
-      const ideas = [];
+      let ideas = [];
       querySnapshot.forEach((doc) => {
-        ideas.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        // Filter out pending ideas locally to avoid requiring a composite index
+        if (data.status !== 'pending_mentor') {
+          ideas.push({ id: doc.id, ...data });
+        }
       });
+      // Trim to limitCount
+      ideas = ideas.slice(0, limitCount);
 
       const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
 

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import { contentService } from '../services/content.service';
+import { userService } from '../services/user.service';
 import toast from 'react-hot-toast';
-import { ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Loader2, AlertTriangle, Users } from 'lucide-react';
 
 const SIMILARITY_THRESHOLD = 0.20;
 
@@ -25,29 +26,46 @@ async function checkOriginality(title, description) {
 }
 
 export default function ContentModal({ open, onClose, type, item, userId, authorName, onSaved }) {
- const [loading, setLoading] = useState(false);
- const [certChecking, setCertChecking] = useState(false);
- const [certResult, setCertResult] = useState(null); // { certified, score } | null
- const [formData, setFormData] = useState({
- title: '',
- description: '',
- tags: ''
- });
+  const [loading, setLoading] = useState(false);
+  const [certChecking, setCertChecking] = useState(false);
+  const [certResult, setCertResult] = useState(null); // { certified, score } | null
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    tags: ''
+  });
+  
+  // Mentor flow state
+  const [needMentor, setNeedMentor] = useState(false);
+  const [mentorId, setMentorId] = useState('');
+  const [mentorNote, setMentorNote] = useState('');
+  const [mentors, setMentors] = useState([]);
 
  const isEdit = !!item;
 
- useEffect(() => {
- if (item) {
- setFormData({
- title: item.title || '',
- description: item.description || '',
- tags: item.tags ? item.tags.join(', ') : ''
- });
- } else {
- setFormData({ title: '', description: '', tags: '' });
- }
- setCertResult(null);
- }, [item, open]);
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        title: item.title || '',
+        description: item.description || '',
+        tags: item.tags ? item.tags.join(', ') : ''
+      });
+      // Currently not supporting editing mentor request post-creation for simplicity
+      setNeedMentor(false);
+    } else {
+      setFormData({ title: '', description: '', tags: '' });
+      setNeedMentor(false);
+      setMentorId('');
+      setMentorNote('');
+    }
+    setCertResult(null);
+
+    if (open && type === 'idea' && !isEdit) {
+      userService.getMentors().then(res => {
+        if (res.data) setMentors(res.data);
+      });
+    }
+  }, [item, open, type, isEdit]);
 
  // Auto-check when title or description changes (debounced)
  useEffect(() => {
@@ -65,23 +83,32 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  return () => clearTimeout(timer);
  }, [formData.title, formData.description, type, isEdit]);
 
- const handleSubmit = async (e) => {
- e.preventDefault();
- if (!formData.title.trim() || !formData.description.trim()) {
- toast.error('Title and description are required');
- return;
- }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.title.trim() || !formData.description.trim()) {
+      toast.error('Title and description are required');
+      return;
+    }
+    if (needMentor && !mentorId) {
+      toast.error('Please select a mentor.');
+      return;
+    }
  
  setLoading(true);
- try {
- const data = {
- title: formData.title,
- description: formData.description,
- tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
- userId: userId,
- authorName: authorName || 'Anonymous',
- certified: type === 'idea' ? (certResult?.certified ?? false) : false,
- };
+    try {
+      const data = {
+        title: formData.title,
+        description: formData.description,
+        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+        userId: userId,
+        authorName: authorName || 'Anonymous',
+        certified: type === 'idea' ? (certResult?.certified ?? false) : false,
+      };
+
+      if (type === 'idea' && needMentor) {
+        data.mentorId = mentorId;
+        data.mentorNote = mentorNote;
+      }
 
  if (isEdit) {
  if (type === 'idea') {
@@ -155,7 +182,7 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  certChecking
  ? 'border-white/10 bg-white/5'
  : certResult?.certified
- ? 'border-amber-500/30 bg-amber-500/10'
+ ? 'border-yellow-500/30 bg-yellow-500/10'
  : certResult && !certResult.certified
  ? 'border-orange-500/30 bg-orange-500/10'
  : 'border-white/5 bg-white/[0.03]'
@@ -167,9 +194,9 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  </>
  ) : certResult?.certified ? (
  <>
- <ShieldCheck size={16} className="text-amber-400 mt-0.5 shrink-0" />
+ <ShieldCheck size={16} className="text-yellow-400 mt-0.5 shrink-0" />
  <div>
- <p className="font-semibold text-amber-400 text-xs">✦ Certified Original</p>
+ <p className="font-semibold text-yellow-400 text-xs">✦ Certified Original</p>
  <p className="text-muted-foreground text-[11px] mt-0.5">
  This idea is less than {Math.round(SIMILARITY_THRESHOLD * 100)}% similar to existing ideas. A certification badge will be added.
  </p>
@@ -191,18 +218,65 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  </div>
  )}
 
- {type === 'idea' && (
- <label className="block space-y-1.5">
- <span className="text-sm font-semibold">Tags (comma separated)</span>
- <input
- type="text"
- className="input h-10 w-full"
- value={formData.tags}
- onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
- placeholder="React, Next.js, AI"
- />
- </label>
- )}
+  {type === 'idea' && (
+    <label className="block space-y-1.5">
+      <span className="text-sm font-semibold">Tags (comma separated)</span>
+      <input
+        type="text"
+        className="input h-10 w-full"
+        value={formData.tags}
+        onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+        placeholder="React, Next.js, AI"
+      />
+    </label>
+  )}
+
+  {type === 'idea' && !isEdit && (
+    <div className="space-y-4 pt-2 border-t border-white/10 mt-2">
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input 
+          type="checkbox" 
+          className="rounded bg-white/5 border-white/20 text-emerald-500 focus:ring-emerald-500/30"
+          checked={needMentor}
+          onChange={(e) => setNeedMentor(e.target.checked)}
+        />
+        <span className="text-sm font-semibold flex items-center gap-1.5">
+          <Users size={16} className="text-emerald-400" /> Need a mentor?
+        </span>
+      </label>
+
+      {needMentor && (
+        <div className="space-y-4 p-4 bg-white/5 rounded-xl border border-white/10">
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold text-zinc-300">Select a Mentor</span>
+            <select
+              className="input h-10 w-full bg-black/40"
+              value={mentorId}
+              onChange={(e) => setMentorId(e.target.value)}
+            >
+              <option value="">-- Choose a Mentor --</option>
+              {mentors.map(m => (
+                <option key={m.id} value={m.id}>{m.displayName || m.email}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold text-zinc-300">Personalized Note</span>
+            <textarea
+              className="input min-h-[80px] w-full py-2 resize-y bg-black/40 text-sm"
+              placeholder="Hi, I'd love your guidance on this idea..."
+              value={mentorNote}
+              onChange={(e) => setMentorNote(e.target.value)}
+            />
+          </label>
+          <p className="text-[11px] text-zinc-500 leading-tight">
+            If you request a mentor, your idea will not be published publicly until the mentor reviews and accepts it.
+          </p>
+        </div>
+      )}
+    </div>
+  )}
  </form>
  </Modal>
  );

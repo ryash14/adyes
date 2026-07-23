@@ -101,140 +101,206 @@ export default function RankProgressWidget({ stats = {}, loading = false }) {
  }, [stats, tierIdx]);
  const TierIcon = tier.icon;
 
- return (
- <div className="relative overflow-hidden rounded-2xl border border-border/60 shadow-sm bg-card">
- {/* Gradient header strip */}
- <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${tier.bg.replace('/20', '').replace('/10', '')}`} />
+  return (
+    <div className="relative overflow-hidden rounded-[24px] border border-white/10 dark:border-white/5 bg-card/40 backdrop-blur-2xl shadow-xl transition-all duration-500 hover:shadow-2xl hover:bg-card/60 group">
+      {/* Top glowing orb */}
+      <div 
+        className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-30 transition-all duration-1000 group-hover:opacity-60"
+        style={{ background: tier.hex }}
+      />
+      
+      {/* Subtle bottom glow */}
+      <div 
+        className="absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-[80px] opacity-20 transition-all duration-1000"
+        style={{ background: tier.hex }}
+      />
 
- {/* Subtle bg tint */}
- <div className={`absolute inset-0 bg-gradient-to-br ${tier.bg} pointer-events-none`} />
+      <div className="relative z-10 p-6 md:p-8">
+        {/* Top row: icon + label */}
+        <div className="flex items-start gap-4 mb-8">
+          <div className="relative">
+            {/* Glowing ring behind icon */}
+            <motion.div 
+              className="absolute inset-0 rounded-2xl opacity-50 blur-md"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{ background: tier.hex }}
+            />
+            <div
+              className="relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md"
+              style={{
+                background: `color-mix(in srgb, ${tier.hex} 20%, rgba(255,255,255,0.05))`,
+              }}
+            >
+              {loading ? (
+                <div className="w-6 h-6 rounded-full bg-white/20 animate-pulse" />
+              ) : (
+                <TierIcon
+                  size={28}
+                  strokeWidth={2.5}
+                  className={tier.color}
+                  style={{ filter: `drop-shadow(0 0 8px ${tier.hex})` }}
+                />
+              )}
+            </div>
+          </div>
+          
+          <div className="flex-1 min-w-0 pt-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+              Current Status
+            </p>
+            {loading ? (
+              <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
+            ) : (
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-black tracking-tight text-foreground leading-none mb-1">
+                  {tier.label}
+                </h3>
+                <span className="text-sm font-semibold text-muted-foreground/80 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: tier.hex }} />
+                  {tier.subtitle}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {!loading && (
+            <div className="flex flex-col items-end">
+              <span className="text-3xl font-black tracking-tighter" style={{ color: tier.hex }}>
+                {tierIdx + 1}
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                of {TIERS.length}
+              </span>
+            </div>
+          )}
+        </div>
 
- <div className="relative z-10 p-5">
- {/* Top row: icon + label */}
- <div className="flex items-center gap-3 mb-4">
- <div
- className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ring-1 ring-inset ring-black/5 dark:ring-white/10"
- style={{
- background: `color-mix(in srgb, ${tier.hex} 15%, transparent)`,
- }}
- >
- {loading ? (
- <div className="w-5 h-5 rounded-full bg-muted animate-pulse" />
- ) : (
- <TierIcon
- size={20}
- strokeWidth={2}
- className={tier.color}
- />
- )}
- </div>
- <div className="flex-1 min-w-0">
- <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
- Current Rank
- </p>
- {loading ? (
- <div className="h-5 w-24 bg-muted rounded animate-pulse" />
- ) : (
- <div className="flex items-baseline gap-2">
- <h3 className="text-base font-black tracking-tight text-foreground leading-none">
- {tier.label}
- </h3>
- <span className="text-[11px] font-semibold text-muted-foreground">
- {tier.subtitle}
- </span>
- </div>
- )}
- </div>
- {!loading && (
- <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
- {tierIdx + 1}/{TIERS.length}
- </span>
- )}
- </div>
+        {/* Segmented tier track */}
+        <div className="flex gap-1.5 mb-2">
+          {TIERS.map((t, i) => {
+            const reached = i <= tierIdx;
+            const isCurrent = i === tierIdx;
+            return (
+              <motion.div
+                key={t.id}
+                className="flex-1 h-2 rounded-full relative overflow-hidden"
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
+                style={{
+                  background: 'var(--muted)',
+                }}
+              >
+                <motion.div 
+                  className="absolute inset-0 w-full h-full"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: reached ? '0%' : '-100%' }}
+                  transition={{ delay: i * 0.1, duration: 0.5, ease: "easeOut" }}
+                  style={{
+                    background: isCurrent 
+                      ? `linear-gradient(90deg, ${t.hex}, color-mix(in srgb, ${t.hex} 70%, white))`
+                      : `color-mix(in srgb, ${t.hex} 40%, transparent)`,
+                    boxShadow: isCurrent ? `0 0 10px ${t.hex}` : 'none',
+                  }}
+                />
+              </motion.div>
+            );
+          })}
+        </div>
 
- {/* Segmented tier track */}
- <div className="flex gap-1 mb-1.5">
- {TIERS.map((t, i) => {
- const reached = i <= tierIdx;
- const isCurrent = i === tierIdx;
- return (
- <motion.div
- key={t.id}
- className="flex-1 h-1.5 rounded-full"
- initial={{ scaleX: 0, opacity: 0 }}
- animate={{ scaleX: 1, opacity: 1 }}
- transition={{ delay: i * 0.05, duration: 0.3 }}
- style={{
- background: reached
- ? isCurrent
- ? t.hex
- : `color-mix(in srgb, ${t.hex} 50%, transparent)`
- : 'var(--muted)',
- boxShadow: isCurrent ? `0 0 6px color-mix(in srgb, ${t.hex} 60%, transparent)` : 'none',
- }}
- />
- );
- })}
- </div>
+        {/* Tier abbreviation labels */}
+        <div className="flex mb-8">
+          {TIERS.map((t, i) => (
+            <span
+              key={t.id}
+              className="flex-1 text-center text-[9px] font-bold uppercase tracking-widest transition-all duration-300"
+              style={{
+                color: i <= tierIdx ? t.hex : 'var(--muted-foreground)',
+                opacity: i <= tierIdx ? 1 : 0.3,
+                textShadow: i === tierIdx ? `0 0 8px color-mix(in srgb, ${t.hex} 50%, transparent)` : 'none'
+              }}
+            >
+              {t.label.slice(0, 3)}
+            </span>
+          ))}
+        </div>
 
- {/* Tier abbreviation labels */}
- <div className="flex mb-4">
- {TIERS.map((t, i) => (
- <span
- key={t.id}
- className="flex-1 text-center text-[8px] font-bold uppercase tracking-wider transition-colors"
- style={{
- color: i <= tierIdx ? t.hex : 'var(--muted-foreground)',
- opacity: i <= tierIdx ? 1 : 0.4,
- }}
- >
- {t.label.slice(0, 3)}
- </span>
- ))}
- </div>
+        {/* Progress to next */}
+        {!loading && nextTier && (
+          <div className="bg-secondary/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 md:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
+              <span className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                Next Rank:
+                <span className="font-bold text-foreground bg-background/50 px-2.5 py-0.5 rounded-md border border-border/50">
+                  {nextTier.label}
+                </span>
+              </span>
+              <span className="text-sm font-black tabular-nums" style={{ color: tier.hex }}>
+                {Math.round(progress * 100)}%
+              </span>
+            </div>
+            
+            <div className="w-full h-2.5 rounded-full bg-background border border-border/50 overflow-hidden relative shadow-inner">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progress * 100}%` }}
+                transition={{ duration: 1.5, ease: [0.34, 1.56, 0.64, 1], delay: 0.4 }}
+                className="absolute top-0 left-0 bottom-0 rounded-full"
+                style={{ 
+                  background: `linear-gradient(90deg, ${tier.hex}, ${nextTier.hex})`,
+                  boxShadow: `0 0 10px ${tier.hex}`
+                }}
+              >
+                {/* Shimmer effect on bar */}
+                <motion.div 
+                  className="absolute top-0 bottom-0 left-0 right-0"
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)'
+                  }}
+                />
+              </motion.div>
+            </div>
+            
+            <div className="flex items-center gap-2 mt-3 p-2.5 bg-background/30 rounded-xl border border-white/5">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-background shrink-0" style={{ color: tier.hex }}>
+                <ChevronRight size={14} strokeWidth={3} />
+              </div>
+              <p className="text-xs font-semibold text-muted-foreground/90 leading-tight">
+                {tier.next}
+              </p>
+            </div>
+          </div>
+        )}
 
- {/* Progress to next */}
- {!loading && nextTier && (
- <div className="bg-muted/60 rounded-xl p-3">
- <div className="flex items-center justify-between mb-2">
- <span className="text-[11px] font-semibold text-muted-foreground">
- Next:{' '}
- <span className="font-bold text-foreground">{nextTier.label}</span>
- </span>
- <span className="text-[11px] font-bold tabular-nums" style={{ color: tier.hex }}>
- {Math.round(progress * 100)}%
- </span>
- </div>
- <div className="w-full h-2 rounded-full bg-border overflow-hidden">
- <motion.div
- initial={{ width: 0 }}
- animate={{ width: `${progress * 100}%` }}
- transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
- className="h-full rounded-full"
- style={{ background: tier.hex }}
- />
- </div>
- <p className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1">
- <ChevronRight size={10} />
- {tier.next}
- </p>
- </div>
- )}
+        {!loading && !nextTier && (
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 text-center relative overflow-hidden group-hover:bg-emerald-500/20 transition-colors">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -right-8 -top-8 text-emerald-500/10"
+            >
+              <Rocket size={120} />
+            </motion.div>
+            <p className="text-lg font-black text-emerald-500 mb-1 flex items-center justify-center gap-2 relative z-10">
+              <Rocket size={20} className="animate-bounce" /> 
+              Max Rank — Pioneer
+            </p>
+            <p className="text-sm font-semibold text-emerald-600/70 dark:text-emerald-400/70 relative z-10">
+              You've reached the top. Inspire others.
+            </p>
+          </div>
+        )}
 
- {!loading && !nextTier && (
- <div className="bg-muted/60 rounded-xl p-3 text-center">
- <p className="text-sm font-bold text-foreground">🚀 Max Rank — Pioneer</p>
- <p className="text-[11px] text-muted-foreground mt-1">You've reached the top. Inspire others.</p>
- </div>
- )}
-
- {loading && (
- <div className="bg-muted/60 rounded-xl p-3 space-y-2">
- <div className="h-2 w-full bg-muted rounded-full animate-pulse" />
- <div className="h-3 w-1/2 bg-muted rounded animate-pulse" />
- </div>
- )}
- </div>
- </div>
- );
+        {loading && (
+          <div className="bg-secondary/30 rounded-2xl p-5 space-y-3 border border-white/5">
+            <div className="h-3 w-full bg-white/10 rounded-full animate-pulse" />
+            <div className="h-4 w-2/3 bg-white/10 rounded-lg animate-pulse" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

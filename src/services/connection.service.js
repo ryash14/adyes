@@ -26,23 +26,28 @@ class ConnectionService {
   /**
    * Send connection request
    */
-  async sendRequest(fromUserId, toUserId, note = '') {
+  async sendRequest(fromUserId, toUserId, note = '', targetIdeaId = null) {
     try {
       // Check if connection already exists
       const existing = await this.getConnection(fromUserId, toUserId);
-      if (existing.data) {
+      if (existing.data && !targetIdeaId) {
         return { data: null, error: 'Connection already exists' };
       }
 
       const connectionsRef = collection(db, this.collectionName);
-      const docRef = await addDoc(connectionsRef, {
+      const docData = {
         fromUserId,
         toUserId,
         status: 'pending',
         note,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+      if (targetIdeaId) {
+        docData.targetIdeaId = targetIdeaId;
+      }
+      
+      const docRef = await addDoc(connectionsRef, docData);
 
       return { data: { id: docRef.id }, error: null };
     } catch (error) {
@@ -227,6 +232,33 @@ class ConnectionService {
     } catch (error) {
       console.error('Error setting alias:', error);
       return { error: error.message };
+    }
+  }
+
+  /**
+   * Get collaborators for a specific idea
+   */
+  async getIdeaCollaborators(ideaId) {
+    try {
+      const connectionsRef = collection(db, this.collectionName);
+      const q = query(
+        connectionsRef,
+        and(
+          where('targetIdeaId', '==', ideaId),
+          where('status', '==', 'accepted')
+        )
+      );
+
+      const querySnapshot = await getDocs(q);
+      const collaborators = [];
+      querySnapshot.forEach((doc) => {
+        collaborators.push({ id: doc.id, ...doc.data() });
+      });
+
+      return { data: collaborators, error: null };
+    } catch (error) {
+      console.error('Error getting idea collaborators:', error);
+      return { data: [], error: error.message };
     }
   }
 }

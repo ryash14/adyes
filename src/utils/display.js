@@ -2,6 +2,7 @@ const ROLE_LABELS = {
   student: 'Student',
   professional: 'Professional',
   entrepreneur: 'Entrepreneur',
+  mentor: 'Mentor',
 };
 
 export function formatRole(role) {

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { GraduationCap, Briefcase, Rocket, X, Code, MessageCircle, Link as LinkIcon, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { GraduationCap, Briefcase, Rocket, X, Code, MessageCircle, Link as LinkIcon, CheckCircle2, ArrowRight, ArrowLeft, Users } from 'lucide-react';
 import AuthLayout from '../components/public/AuthLayout';
 import Badge from '../components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -201,19 +201,19 @@ export default function ProfileSetup() {
  <div className="flex items-center justify-center gap-2 mb-8">
  {[1, 2, 3].map((s) => (
  <div key={s} className="flex items-center gap-2">
- <div className={cn(
- "flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-300",
- s < step ? "bg-emerald-500 text-white" :
- s === step ? "bg-accent text-accent-foreground ring-4 ring-accent/20" :
- "bg-secondary text-muted-foreground border border-border"
- )}>
- {s < step ? <CheckCircle2 size={16} /> : s}
- </div>
- {s < 3 && (
- <div className={cn(
- "w-12 h-0.5 rounded-full transition-all duration-500",
- s < step ? "bg-emerald-500" : "bg-border"
- )} />
+        <div className={cn(
+          "flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-300",
+          s < step ? "bg-white text-black" :
+          s === step ? "bg-white text-black ring-4 ring-white/20" :
+          "bg-[#1c1c1c] text-[#888888] border-transparent"
+        )}>
+          {s < step ? <CheckCircle2 size={16} /> : s}
+        </div>
+        {s < 3 && (
+          <div className={cn(
+            "w-12 h-0.5 rounded-full transition-all duration-500",
+            s < step ? "bg-white" : "bg-[#1c1c1c]"
+          )} />
  )}
  </div>
  ))}
@@ -230,84 +230,93 @@ export default function ProfileSetup() {
  transition={{ duration: 0.3, ease: "easeInOut" }}
  className="flex flex-col gap-8"
  >
- {step === 1 && (
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
- {[
- { id: 'student', label: 'Student', icon: GraduationCap, desc: 'Learning & building' },
- { id: 'professional', label: 'Professional', icon: Briefcase, desc: 'Working in industry' },
- { id: 'entrepreneur', label: 'Entrepreneur', icon: Rocket, desc: 'Building a startup' },
- ].map((role) => (
- <button
- key={role.id}
- type="button"
- className={cn(
-"flex flex-col items-center justify-center gap-3 rounded-2xl border-2 px-4 py-8 text-sm font-bold uppercase tracking-wider transition-all duration-200",
- formData.role === role.id
- ?"border-accent bg-accent/10 text-accent shadow-lg shadow-accent/10 scale-[1.02]"
- :"border-border hover:border-accent/50 hover:bg-secondary text-muted-foreground hover:text-foreground"
- )}
- onClick={() => setFormData({ ...formData, role: role.id })}
- >
- <div className={cn(
-"h-14 w-14 rounded-full flex items-center justify-center transition-all duration-200",
- formData.role === role.id ?"bg-accent text-accent-foreground" :"bg-secondary text-muted-foreground"
- )}>
- <role.icon size={26} strokeWidth={2} />
- </div>
- <span>{role.label}</span>
- <span className="text-[10px] font-medium text-muted-foreground normal-case tracking-normal">{role.desc}</span>
- </button>
- ))}
- </div>
- )}
+  {step === 1 && (
+  <div className="flex flex-col gap-3 pt-2">
+  {[
+  { id: 'student', label: 'Student', icon: GraduationCap, desc: 'Learning & building' },
+  { id: 'professional', label: 'Professional', icon: Briefcase, desc: 'Working in industry' },
+  { id: 'entrepreneur', label: 'Entrepreneur', icon: Rocket, desc: 'Building a startup' },
+  { id: 'mentor', label: 'Mentor', icon: Users, desc: 'Guiding others' },
+  ].map((role) => (
+  <button
+  key={role.id}
+  type="button"
+  className={cn(
+    "flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200",
+    formData.role === role.id
+    ? "border-white bg-white/10 shadow-sm"
+    : "border-transparent bg-[#1c1c1c] hover:border-white/20 hover:bg-white/5"
+  )}
+  onClick={() => setFormData({ ...formData, role: role.id })}
+  >
+  <div className={cn(
+    "h-12 w-12 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200",
+    formData.role === role.id ? "bg-white text-black" : "bg-[#222222] text-[#888888]"
+  )}>
+  <role.icon size={24} strokeWidth={1.5} />
+  </div>
+  <div>
+    <div className={cn(
+      "font-semibold text-[15px]",
+      formData.role === role.id ? "text-white" : "text-[#dddddd]"
+    )}>
+      {role.label}
+    </div>
+    <div className="text-[13px] text-zinc-400 mt-0.5">{role.desc}</div>
+  </div>
+  </button>
+  ))}
+  </div>
+  )}
 
  {step === 2 && (
- <div className="flex flex-col gap-8">
- <label className="flex flex-col gap-2">
- <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">College or Organization</span>
- <Input
- type="text"
- placeholder="e.g. Stanford University"
- value={formData.college}
- onChange={(e) => setFormData({ ...formData, college: e.target.value })}
- />
- </label>
+  <div className="flex flex-col gap-8">
+  <label className="flex flex-col gap-2 relative">
+  <span className="text-xs font-bold uppercase tracking-wider text-[#888888]">College or Organization</span>
+  <Input
+  type="text"
+  placeholder="e.g. Stanford University"
+  value={formData.college}
+  onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+  className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4"
+  />
+  </label>
 
- <div className="flex flex-col gap-2 relative">
- <div className="flex items-center justify-between">
- <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Skills and Interests</span>
- {formData.skills.length > 0 && (
- <span className="text-[10px] font-bold text-muted-foreground">{formData.skills.length}/10</span>
- )}
- </div>
- <div 
- className="flex flex-wrap items-center gap-2 p-3 min-h-[56px] rounded-lg border-2 border-border bg-card backdrop-blur-sm focus-within:ring-2 focus-within:ring-accent focus-within:border-accent transition-all cursor-text"
- onClick={() => inputRef.current?.focus()}
- >
+  <div className="flex flex-col gap-2 relative">
+  <div className="flex items-center justify-between">
+  <span className="text-xs font-bold uppercase tracking-wider text-[#888888]">Skills and Interests</span>
+  {formData.skills.length > 0 && (
+  <span className="text-[10px] font-bold text-[#888888]">{formData.skills.length}/10</span>
+  )}
+  </div>
+  <div 
+  className="flex flex-wrap items-center gap-2 p-2 min-h-[44px] rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white transition-all cursor-text"
+  onClick={() => inputRef.current?.focus()}
+  >
  <AnimatePresence>
  {formData.skills.map((skill) => (
- <motion.div
- key={skill}
- initial={{ opacity: 0, scale: 0.8 }}
- animate={{ opacity: 1, scale: 1 }}
- exit={{ opacity: 0, scale: 0.8 }}
- transition={{ duration: 0.15 }}
- >
- <Badge className="flex items-center gap-1.5 pr-1.5 py-1 text-sm bg-secondary border-border text-foreground rounded-md px-2">
- {skill}
- <button type="button" className="rounded-full hover:bg-muted p-1 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
- <X size={14} strokeWidth={2.5} className="text-muted-foreground hover:text-foreground" />
- </button>
- </Badge>
- </motion.div>
+  <motion.div
+  key={skill}
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  exit={{ opacity: 0, scale: 0.8 }}
+  transition={{ duration: 0.15 }}
+  >
+  <Badge className="flex items-center gap-1.5 pr-1.5 py-1 text-xs bg-[#2a2a2a] border-transparent text-white rounded-md px-2 hover:bg-[#333333]">
+  {skill}
+  <button type="button" className="rounded-full hover:bg-white/10 p-1 transition-colors" onClick={(e) => { e.stopPropagation(); removeSkill(skill); }}>
+  <X size={12} strokeWidth={2.5} className="text-[#888888] hover:text-white" />
+  </button>
+  </Badge>
+  </motion.div>
  ))}
  </AnimatePresence>
- <div className="flex-1 min-w-[120px]">
- <input
- ref={inputRef}
- type="text"
- className="w-full bg-transparent border-none outline-none text-base placeholder:text-muted-foreground"
- placeholder={formData.skills.length === 0 ?"Search skills..." :""}
+  <div className="flex-1 min-w-[120px] px-2">
+  <input
+  ref={inputRef}
+  type="text"
+  className="w-full bg-transparent border-none outline-none text-[14px] text-white placeholder:text-[#666666]"
+  placeholder={formData.skills.length === 0 ?"Search skills..." :""}
  value={skillInput}
  onChange={(e) => {
  setSkillInput(e.target.value);
@@ -361,132 +370,135 @@ export default function ProfileSetup() {
  )}
  </div>
 
- <label className="flex flex-col gap-2">
- <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bio</span>
- <textarea
- className="flex w-full rounded-lg border-2 border-border bg-card backdrop-blur-sm px-4 py-3 text-base font-medium transition-all duration-200 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent min-h-[140px] resize-none"
- placeholder="Briefly describe what you're building, your background, or what kind of co-founders you're looking for."
- value={formData.bio}
- onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
- />
- </label>
+  <label className="flex flex-col gap-2">
+  <span className="text-xs font-bold uppercase tracking-wider text-[#888888]">Bio</span>
+  <textarea
+  className="flex w-full rounded-xl bg-[#1c1c1c] px-4 py-3 text-[14px] text-white transition-all duration-200 placeholder:text-[#666666] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white min-h-[120px] resize-none"
+  placeholder="Briefly describe what you're building, your background, or what kind of co-founders you're looking for."
+  value={formData.bio}
+  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+  />
+  </label>
  </div>
  )}
 
- {step === 3 && (
- <div className="flex flex-col gap-6">
- <div className="flex flex-col gap-2">
- <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
- <Code size={16} /> GitHub Username
- </label>
- <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
- github.com/
- </div>
- <input
- type="text"
- className="flex-1 bg-transparent px-4 outline-none text-base text-foreground font-medium"
- placeholder="username"
+  {step === 3 && (
+  <div className="flex flex-col gap-6">
+  <div className="flex flex-col gap-2">
+  <label className="text-xs font-bold uppercase tracking-wider text-[#888888] flex items-center gap-2">
+  <Code size={16} /> GitHub Username
+  </label>
+  <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
+  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  github.com/
+  </div>
+  <input
+  type="text"
+  className="flex-1 bg-transparent px-4 outline-none text-[14px] text-white"
+  placeholder="username"
  value={formData.github}
  onChange={(e) => setFormData({ ...formData, github: e.target.value })}
  />
  </div>
  </div>
 
- <div className="flex flex-col gap-2">
- <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
- <Briefcase size={16} /> LinkedIn Username
- </label>
- <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
- linkedin.com/in/
- </div>
- <input
- type="text"
- className="flex-1 bg-transparent px-4 outline-none text-base text-foreground font-medium"
- placeholder="username"
- value={formData.linkedin}
- onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
- />
- </div>
- </div>
+  <div className="flex flex-col gap-2">
+  <label className="text-xs font-bold uppercase tracking-wider text-[#888888] flex items-center gap-2">
+  <Briefcase size={16} /> LinkedIn Username
+  </label>
+  <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
+  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  linkedin.com/in/
+  </div>
+  <input
+  type="text"
+  className="flex-1 bg-transparent px-4 outline-none text-[14px] text-white"
+  placeholder="username"
+  value={formData.linkedin}
+  onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+  />
+  </div>
+  </div>
 
- <div className="flex flex-col gap-2">
- <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
- <MessageCircle size={16} /> Twitter / X Username
- </label>
- <div className="flex h-12 w-full rounded-lg border-2 border-border bg-card focus-within:ring-2 focus-within:ring-accent focus-within:border-accent overflow-hidden transition-all">
- <div className="px-4 flex items-center border-r-2 border-border bg-secondary text-muted-foreground text-sm font-medium">
- twitter.com/
- </div>
- <input
- type="text"
- className="flex-1 bg-transparent px-4 outline-none text-base text-foreground font-medium"
- placeholder="username"
- value={formData.twitter}
- onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
- />
- </div>
- </div>
+  <div className="flex flex-col gap-2">
+  <label className="text-xs font-bold uppercase tracking-wider text-[#888888] flex items-center gap-2">
+  <MessageCircle size={16} /> Twitter / X Username
+  </label>
+  <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
+  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  twitter.com/
+  </div>
+  <input
+  type="text"
+  className="flex-1 bg-transparent px-4 outline-none text-[14px] text-white"
+  placeholder="username"
+  value={formData.twitter}
+  onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
+  />
+  </div>
+  </div>
 
- <div className="flex flex-col gap-2">
- <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
- <LinkIcon size={16} /> Personal Portfolio
- </label>
- <Input
- type="url"
- placeholder="https://yourwebsite.com"
- value={formData.portfolio}
- onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
- />
- </div>
+  <div className="flex flex-col gap-2">
+  <label className="text-xs font-bold uppercase tracking-wider text-[#888888] flex items-center gap-2">
+  <LinkIcon size={16} /> Personal Portfolio
+  </label>
+  <Input
+  type="url"
+  placeholder="https://yourwebsite.com"
+  value={formData.portfolio}
+  onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
+  className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4"
+  />
+  </div>
  </div>
  )}
  </motion.div>
  </AnimatePresence>
 
- <div className="flex gap-4 pt-6 mt-8 border-t border-border">
- {step > 1 ? (
- <Button type="button" variant="secondary" className="flex-1 flex items-center justify-center gap-2" onClick={handleBack}>
- <ArrowLeft size={16} />
- Back
- </Button>
- ) : (
- <div className="hidden md:block flex-1" />
- )}
+  <div className="flex gap-4 pt-6 mt-8 border-t border-[#2a2a2a]">
+  {step > 1 ? (
+  <button 
+    type="button" 
+    className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full border border-[#2a2a2a] text-white bg-transparent hover:bg-white/5 transition-colors text-[14px] font-semibold" 
+    onClick={handleBack}
+  >
+  <ArrowLeft size={16} />
+  Back
+  </button>
+  ) : (
+  <div className="hidden md:block flex-1" />
+  )}
 
- {step < 3 ? (
- <Button
- type="button"
- variant="primary"
- className="flex-1 flex items-center justify-center gap-2"
- onClick={handleNext}
- disabled={!canProceed()}
- >
- Continue
- <ArrowRight size={16} />
- </Button>
- ) : (
- <Button
- type="button"
- variant="primary"
- className="flex-1 flex items-center justify-center gap-2"
- onClick={handleSubmit}
- disabled={loading}
- >
- {loading ? (
- <span className="flex items-center gap-2">
- <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
- Finishing...
- </span>
- ) : (
- <>
- <CheckCircle2 size={16} />
- Complete Setup
- </>
- )}
- </Button>
- )}
+  {step < 3 ? (
+  <button
+  type="button"
+  className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full bg-white text-black hover:bg-zinc-200 transition-colors text-[14px] font-semibold disabled:opacity-50 disabled:pointer-events-none"
+  onClick={handleNext}
+  disabled={!canProceed()}
+  >
+  Continue
+  <ArrowRight size={16} />
+  </button>
+  ) : (
+  <button
+  type="button"
+  className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full bg-white text-black hover:bg-zinc-200 transition-colors text-[14px] font-semibold disabled:opacity-50 disabled:pointer-events-none"
+  onClick={handleSubmit}
+  disabled={loading}
+  >
+  {loading ? (
+  <span className="flex items-center gap-2">
+  <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+  Finishing...
+  </span>
+  ) : (
+  <>
+  <CheckCircle2 size={16} />
+  Complete Setup
+  </>
+  )}
+  </button>
+  )}
  </div>
  </AuthLayout>
  );

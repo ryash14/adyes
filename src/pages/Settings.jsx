@@ -311,7 +311,8 @@ export default function Settings() {
  options={[
  { label: 'Student', value: 'student' },
  { label: 'Professional', value: 'professional' },
- { label: 'Entrepreneur', value: 'entrepreneur' }
+ { label: 'Entrepreneur', value: 'entrepreneur' },
+ { label: 'Mentor', value: 'mentor' }
  ]}
  />
  </div>

@@ -22,6 +22,7 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import RankProgressWidget from '../components/RankProgressWidget';
+import { cn } from '../utils/cn';
 
 const staggerContainer = {
  hidden: { opacity: 0 },
@@ -52,19 +53,22 @@ function AnimatedNumber({ value }) {
 
 const STAT_CARDS = [
  {
- label: 'Active Ideas',
+ label: 'Your Ideas',
  key: 'ideas',
  icon: Lightbulb,
+ color: 'yellow',
  },
  {
- label: 'Live Projects',
+ label: 'Your Projects',
  key: 'projects',
  icon: Rocket,
+ color: 'blue',
  },
  {
- label: 'Connections',
+ label: 'Your Network',
  key: 'connections',
  icon: Users,
+ color: 'emerald',
  },
 ];
 
@@ -72,8 +76,9 @@ export default function Dashboard() {
  const { profile } = useAuth();
  const navigate = useNavigate();
  const [stats, setStats] = useState({ ideas: 0, projects: 0, connections: 0 });
- const [loading, setLoading] = useState(true);
- const [recentIdeas, setRecentIdeas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [recentIdeas, setRecentIdeas] = useState([]);
+  const [pendingIdeas, setPendingIdeas] = useState([]);
 
  useEffect(() => {
  const loadDashboard = async () => {
@@ -84,20 +89,35 @@ export default function Dashboard() {
  contentService.getUserProjects(profile.id),
  import('../services/connection.service').then(m => m.connectionService.getUserConnections(profile.id))
  ]);
- const allIdeas = ideasRes.data || [];
- const allProjects = projectsRes.data || [];
- setStats({ ideas: allIdeas.length, projects: allProjects.length, connections: connRes.data?.length || 0 });
- setRecentIdeas(allIdeas.slice(0, 3));
+      const allIdeas = ideasRes.data || [];
+      const allProjects = projectsRes.data || [];
+      setStats({ ideas: allIdeas.length, projects: allProjects.length, connections: connRes.data?.length || 0 });
+      setRecentIdeas(allIdeas.slice(0, 3));
+
+      if (profile.role === 'mentor') {
+        const pendingRes = await contentService.getPendingIdeasForMentor(profile.id);
+        setPendingIdeas(pendingRes.data || []);
+      }
  } catch (error) {
  console.error('Error loading dashboard:', error);
  } finally {
  setLoading(false);
  }
- };
- loadDashboard();
- }, [profile?.id]);
+  };
+  loadDashboard();
+  }, [profile?.id, profile?.role]);
 
- const greeting = () => {
+  const handleMentorAction = async (ideaId, action) => {
+    try {
+      const newStatus = action === 'accept' ? 'published' : 'rejected';
+      await contentService.updateIdeaStatus(ideaId, newStatus);
+      setPendingIdeas(prev => prev.filter(idea => idea.id !== ideaId));
+    } catch (err) {
+      console.error('Failed to update idea', err);
+    }
+  };
+
+  const greeting = () => {
  const h = new Date().getHours();
  if (h < 12) return 'Good morning';
  if (h < 17) return 'Good afternoon';
@@ -117,16 +137,16 @@ export default function Dashboard() {
  className="flex flex-col md:flex-row md:items-end justify-between gap-6"
  >
  <div>
- <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-bold mb-4 tracking-wide">
- <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+ <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2a2a2a] bg-[#111111] text-[#888888] text-xs font-bold mb-4 tracking-wide">
+ <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
  Workspace Overview
  </div>
- <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-tight">
+ <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
  {greeting()},{' '}
- <span className="text-accent">{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>.
+ <span className="text-white">{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>.
  </h1>
  <p className="text-muted-foreground mt-2 text-sm md:text-base">
- Here's what's happening in your network today.
+ Here's what's happening across your workspace.
  </p>
  </div>
  <div className="flex items-center gap-3 shrink-0">
@@ -154,7 +174,14 @@ export default function Dashboard() {
  animate="show"
  className="grid grid-cols-1 md:grid-cols-3 gap-4"
  >
- {STAT_CARDS.map((s) => (
+ {STAT_CARDS.map((s) => {
+ const colorClasses = {
+   yellow: 'hover:border-yellow-500/30 hover:bg-yellow-500/5 group-hover:text-yellow-400',
+   blue: 'hover:border-blue-500/30 hover:bg-blue-500/5 group-hover:text-blue-400',
+   emerald: 'hover:border-emerald-500/30 hover:bg-emerald-500/5 group-hover:text-emerald-400',
+ }[s.color];
+
+ return (
  <motion.div
  key={s.label}
  variants={fadeUp}
@@ -162,19 +189,21 @@ export default function Dashboard() {
  if (s.key === 'connections') navigate('/network');
  else navigate(`/discover?tab=${s.key}`);
  }}
- className="relative overflow-hidden rounded-xl border border-border bg-card p-5 group cursor-pointer transition-all duration-300 hover:border-muted-foreground/30 hover:bg-white/[0.02]"
+ className={cn("relative overflow-hidden rounded-xl border border-border bg-card p-5 group cursor-pointer transition-all duration-300", colorClasses)}
  >
  <div className="flex items-center justify-between mb-4 relative z-10">
- <div className="text-muted-foreground group-hover:text-foreground transition-colors">
- <s.icon size={20} strokeWidth={1.5} />
+ <div className="text-muted-foreground transition-colors group-hover:inherit">
+ <s.icon size={20} strokeWidth={1.5} className={s.color === 'yellow' ? 'group-hover:text-yellow-400' : s.color === 'blue' ? 'group-hover:text-blue-400' : 'group-hover:text-emerald-400'} />
  </div>
- <TrendingUp size={14} className="text-muted-foreground/30 group-hover:text-foreground/50 transition-colors" />
+ <TrendingUp size={14} className="text-muted-foreground/30 transition-colors group-hover:opacity-100 opacity-50" />
  </div>
  <div className="relative z-10">
- <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+ <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 group-hover:text-foreground transition-colors">
  {s.label}
  </p>
- <p className="text-4xl font-normal tracking-tight text-foreground tabular-nums mt-1">
+ <p className="text-4xl font-bold tracking-tight text-foreground tabular-nums mt-1"
+  style={{ fontFamily: '"Inter", system-ui, sans-serif', fontVariantNumeric: 'tabular-nums' }}
+ >
  {loading ? (
  <span className="inline-block w-12 h-9 bg-muted/60 rounded animate-pulse" />
  ) : (
@@ -183,20 +212,60 @@ export default function Dashboard() {
  </p>
  </div>
  </motion.div>
- ))}
+ );
+ })}
  </motion.div>
 
- {/* ── Main Grid ── */}
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  {/* ── Main Grid ── */}
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
- {/* ── Recent Ideas (2/3 width) ── */}
- <motion.div
- initial={{ opacity: 0, x: -16 }}
- animate={{ opacity: 1, x: 0 }}
- transition={{ delay: 0.25 }}
- className="lg:col-span-2"
- >
- <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
+  {/* ── Recent Ideas & Mentor Requests (2/3 width) ── */}
+  <motion.div
+  initial={{ opacity: 0, x: -16 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ delay: 0.25 }}
+  className="lg:col-span-2 space-y-6"
+  >
+  
+  {/* Mentor Pending Requests Widget */}
+  {profile?.role === 'mentor' && pendingIdeas.length > 0 && (
+    <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/10">
+        <div>
+          <h2 className="text-base font-bold text-emerald-400 flex items-center gap-2">
+            <Sparkles size={16} /> Pending Mentor Requests
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Builders are waiting for your guidance</p>
+        </div>
+      </div>
+      <div className="p-4 space-y-3">
+        {pendingIdeas.map((idea) => (
+          <div key={idea.id} className="p-4 rounded-xl border border-emerald-500/20 bg-background/50 flex flex-col gap-3">
+            <div>
+              <h3 className="font-bold text-sm text-foreground">{idea.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{idea.description}</p>
+            </div>
+            {idea.mentorNote && (
+              <div className="bg-muted/40 p-3 rounded-lg text-sm italic text-muted-foreground border-l-2 border-emerald-500/50">
+                "{idea.mentorNote}"
+                <p className="text-xs font-semibold not-italic mt-1 text-foreground">— {idea.authorName}</p>
+              </div>
+            )}
+            <div className="flex justify-end gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => handleMentorAction(idea.id, 'reject')} className="h-8 text-xs border-red-500/30 text-red-400 hover:bg-red-500/10">
+                Reject
+              </Button>
+              <Button size="sm" variant="primary" onClick={() => handleMentorAction(idea.id, 'accept')} className="h-8 text-xs">
+                Approve & Publish
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
  {/* Panel header */}
  <div className="flex items-center justify-between px-6 py-4 border-b border-border">
  <div>
@@ -205,7 +274,7 @@ export default function Dashboard() {
  </div>
  <button
  onClick={() => navigate(`/profile/${profile?.id}`)}
- className="text-xs font-bold text-accent hover:text-accent/80 transition-colors inline-flex items-center gap-1 hover:gap-1.5"
+ className="text-xs font-bold text-yellow-500/80 hover:text-yellow-400 transition-colors inline-flex items-center gap-1 hover:gap-1.5"
  >
  View all <ArrowRight size={13} />
  </button>
@@ -230,14 +299,14 @@ export default function Dashboard() {
  initial={{ opacity: 0, y: 8 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: i * 0.08 }}
- className="group flex gap-4 p-4 rounded-xl border border-transparent hover:border-border/60 hover:bg-muted/40 transition-all duration-200 cursor-pointer"
+ className="group flex gap-4 p-4 rounded-xl border border-transparent hover:border-yellow-500/30 hover:bg-yellow-500/5 transition-all duration-200 cursor-pointer"
  onClick={() => navigate('/discover')}
  >
- <div className="text-muted-foreground shrink-0 group-hover:text-foreground transition-colors mt-0.5">
+ <div className="text-muted-foreground shrink-0 group-hover:text-yellow-400 transition-colors mt-0.5">
  <Lightbulb size={20} strokeWidth={1.5} />
  </div>
  <div className="flex-1 min-w-0">
- <h3 className="font-bold text-sm text-foreground group-hover:text-accent transition-colors truncate">
+ <h3 className="font-bold text-sm text-foreground group-hover:text-yellow-400 transition-colors truncate">
  {idea.title}
  </h3>
  <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{idea.description}</p>
@@ -253,7 +322,7 @@ export default function Dashboard() {
  )}
  </div>
  </div>
- <ArrowRight size={14} className="text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+ <ArrowRight size={14} className="text-muted-foreground/30 group-hover:text-yellow-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
  </motion.div>
  ))}
  </AnimatePresence>

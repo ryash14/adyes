@@ -118,6 +118,27 @@ class UserService {
   }
 
   /**
+   * Get all users with the role 'mentor'
+   */
+  async getMentors() {
+    try {
+      const q = query(
+        collection(db, this.collectionName),
+        where('role', '==', 'mentor')
+      );
+      const querySnapshot = await getDocs(q);
+      const mentors = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      return { data: mentors, error: null };
+    } catch (error) {
+      console.error('Error fetching mentors:', error);
+      return { data: null, error: error.message };
+    }
+  }
+
+  /**
    * Toggle a saved item for a user
    */
   async toggleSavedItem(userId, itemId) {

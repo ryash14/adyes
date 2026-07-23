@@ -22,6 +22,7 @@ export default function PostDetails() {
  const [connectionStatus, setConnectionStatus] = useState(null);
  const [isSaved, setIsSaved] = useState(false);
  const [isCollabbing, setIsCollabbing] = useState(false);
+ const [ideaCollaborators, setIdeaCollaborators] = useState([]);
  
  const [debateComments, setDebateComments] = useState([]);
  const [debateInput, setDebateInput] = useState('');
@@ -37,6 +38,11 @@ export default function PostDetails() {
  const res = await fetchFn(id);
  if (res.data) {
  setItem(res.data);
+        if (isIdea) {
+          connectionService.getIdeaCollaborators(id).then(collabRes => {
+            if (collabRes.data) setIdeaCollaborators(collabRes.data);
+          });
+        }
  } else {
  toast.error('Item not found');
  navigate('/discover');
@@ -90,17 +96,17 @@ export default function PostDetails() {
    setIsCollabbing(true);
    try {
      const note = `Hi ${item.authorName || 'there'}! I'd love to collaborate on your ${isIdea ? 'idea' : 'project'} "${item.title}".`;
-     const res = await connectionService.sendRequest(user.uid, itemUserId, note);
- if (!res?.error) {
- toast.success('Collaboration request sent!');
- } else {
- toast.error(res.error);
- }
- } catch {
- toast.error('Failed to send collab request');
- } finally {
- setIsCollabbing(false);
- }
+     const res = await connectionService.sendRequest(user.uid, itemUserId, note, item.id);
+     if (!res?.error) {
+       toast.success('Collaboration request sent!');
+     } else {
+       toast.error(res.error);
+     }
+   } catch {
+     toast.error('Failed to send collab request');
+   } finally {
+     setIsCollabbing(false);
+   }
  };
 
  const handleAddDebateComment = () => {
@@ -234,6 +240,33 @@ export default function PostDetails() {
                           {tag}
                         </Badge>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Collaborators Group */}
+                {isIdea && ideaCollaborators.length > 0 && (
+                  <div className="pt-6 border-t border-border">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+                      Collaborator Group ({ideaCollaborators.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {ideaCollaborators.map(collab => {
+                        // Assuming collab object contains fromUserId which might be the collaborator 
+                        // if they initiated the request, or we just display a placeholder avatar
+                        const isFromUser = collab.fromUserId !== item.userId;
+                        const collabUserId = isFromUser ? collab.fromUserId : collab.toUserId;
+                        return (
+                          <div 
+                            key={collab.id} 
+                            className="flex items-center gap-2 bg-secondary/50 border border-border rounded-full pr-4 p-1 cursor-pointer hover:bg-secondary transition-colors"
+                            onClick={() => navigate(`/profile/${collabUserId}`)}
+                          >
+                            <Avatar size="sm" fallback="U" />
+                            <span className="text-sm font-semibold text-foreground">Member</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

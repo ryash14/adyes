@@ -14,6 +14,9 @@ import {
   updateProfile,
   sendPasswordResetEmail,
   sendEmailVerification,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { userService } from './user.service';
@@ -28,30 +31,13 @@ class AuthService {
   }
 
   /**
-   * Register with email and password
+   * Register with Email and Password
    */
-  async registerWithEmail(email, password, displayName) {
+  async registerWithEmail(email, password) {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Update profile with display name
-      if (displayName) {
-        await updateProfile(user, { displayName });
-      }
-
-      // Create user document in Firestore
-      await userService.createUser(user.uid, {
-        email: user.email,
-        displayName: displayName || user.email,
-        photoURL: user.photoURL,
-        createdAt: new Date().toISOString(),
-      });
-
-      // Send verification email
-      await sendEmailVerification(user);
-
-      return { user, error: null };
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const oauthResult = await this.handleOAuthResult(result);
+      return oauthResult;
     } catch (error) {
       console.error('Registration error:', error);
       return { user: null, error: this.handleAuthError(error) };
@@ -59,14 +45,14 @@ class AuthService {
   }
 
   /**
-   * Sign in with email and password
+   * Login with Email and Password
    */
-  async signInWithEmail(email, password) {
+  async loginWithEmail(email, password) {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return { user: userCredential.user, error: null };
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      return { user: result.user, error: null };
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Login error:', error);
       return { user: null, error: this.handleAuthError(error) };
     }
   }

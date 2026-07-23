@@ -6,11 +6,12 @@ const Button = React.forwardRef(({ className, variant = 'primary', size = 'defau
  const Comp = asChild ? motion.div : motion.button;
  
  const variants = {
- primary: 'bg-accent text-black font-semibold shadow-[0_0_15px_rgba(204,255,0,0.3)] hover:shadow-[0_0_25px_rgba(204,255,0,0.5)] hover:-translate-y-0.5 border border-accent/50',
- secondary: 'bg-zinc-900/80 text-foreground border border-white/10 shadow-lg hover:-translate-y-0.5 hover:bg-zinc-800 hover:border-white/20',
- outline: 'bg-transparent text-foreground border border-white/10 shadow-sm hover:bg-white/5 hover:border-white/20',
- ghost: 'hover:bg-white/5 text-muted-foreground hover:text-foreground',
- link: 'underline-offset-4 hover:underline text-accent',
+ primary: 'bg-white text-black font-semibold hover:bg-zinc-200 hover:-translate-y-0.5 border border-transparent',
+ secondary: 'bg-[#1c1c1c] text-white border border-[#2a2a2a] hover:-translate-y-0.5 hover:bg-[#222222] hover:border-[#333333]',
+ outline: 'bg-transparent text-white border border-[#2a2a2a] hover:bg-white/5 hover:border-[#444444]',
+ ghost: 'hover:bg-white/5 text-[#888888] hover:text-white',
+ link: 'underline-offset-4 hover:underline text-white',
+ destructive: 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20',
  };
 
  const sizes = {
@@ -23,7 +24,7 @@ const Button = React.forwardRef(({ className, variant = 'primary', size = 'defau
  return (
  <Comp
  className={cn(
- 'inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+ 'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
  variants[variant],
  sizes[size],
  className

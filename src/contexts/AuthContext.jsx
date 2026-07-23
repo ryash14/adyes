@@ -71,25 +71,25 @@ export const AuthProvider = ({ children }) => {
  };
  }, [fetchProfile]);
 
- const signInWithEmail = useCallback(async (email, password) => {
- const { user: firebaseUser, error } = await authService.signInWithEmail(email, password);
- if (error) {
- toast.error(error);
- return { error };
- }
- toast.success('Welcome back!');
- return { user: firebaseUser, error: null };
- }, []);
+  const registerWithEmail = useCallback(async (email, password) => {
+    const { user: firebaseUser, error } = await authService.registerWithEmail(email, password);
+    if (error) {
+      toast.error(error);
+      return { user: null, error };
+    }
+    toast.success('Account created successfully!');
+    return { user: firebaseUser, error: null };
+  }, []);
 
- const registerWithEmail = useCallback(async (email, password, displayName) => {
- const { user: firebaseUser, error } = await authService.registerWithEmail(email, password, displayName);
- if (error) {
- toast.error(error);
- return { error };
- }
- toast.success('Account created successfully!');
- return { user: firebaseUser, error: null };
- }, []);
+  const loginWithEmail = useCallback(async (email, password) => {
+    const { user: firebaseUser, error } = await authService.loginWithEmail(email, password);
+    if (error) {
+      toast.error(error);
+      return { user: null, error };
+    }
+    toast.success('Successfully logged in!');
+    return { user: firebaseUser, error: null };
+  }, []);
 
  const signInWithGoogle = useCallback(async () => {
  const { user: firebaseUser, error } = await authService.signInWithGoogle();
@@ -178,22 +178,22 @@ export const AuthProvider = ({ children }) => {
  }
  }, [user, fetchProfile]);
 
- const value = useMemo(
- () => ({
- user,
- profile,
- loading,
- signInWithEmail,
- registerWithEmail,
- signInWithGoogle,
- signInWithGithub,
- signOut,
- updateProfile,
- completeProfile,
- refreshProfile,
- }),
- [user, profile, loading, signInWithEmail, registerWithEmail, signInWithGoogle, signInWithGithub, signOut, updateProfile, completeProfile, refreshProfile]
- );
+  const value = useMemo(
+  () => ({
+  user,
+  profile,
+  loading,
+  registerWithEmail,
+  loginWithEmail,
+  signInWithGoogle,
+  signInWithGithub,
+  signOut,
+  updateProfile,
+  completeProfile,
+  refreshProfile,
+  }),
+  [user, profile, loading, registerWithEmail, loginWithEmail, signInWithGoogle, signInWithGithub, signOut, updateProfile, completeProfile, refreshProfile]
+  );
 
  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

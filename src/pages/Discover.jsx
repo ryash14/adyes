@@ -316,18 +316,18 @@ export default function Discover() {
  return (
  <AppShell>
  <div className="mb-10 max-w-7xl mx-auto">
- <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-secondary text-foreground text-xs font-semibold mb-4 tracking-wide shadow-sm">
- <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" />
+ <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2a2a2a] bg-[#111111] text-[#888888] text-xs font-semibold mb-4 tracking-wide">
+ <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
  Global Network
  </div>
- <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Discover</h1>
- <p className="text-muted-foreground mt-2 text-base">Browse the latest ideas and projects from our global community.</p>
+ <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">Discover</h1>
+ <p className="text-[#888888] mt-2 text-base">Browse the latest ideas and projects from the community.</p>
  </div>
 
  <div className="space-y-10 max-w-7xl mx-auto">
  <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
  <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full lg:w-auto">
- <TabsList className="grid w-full grid-cols-2 md:w-[320px] p-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-border rounded-xl shadow-sm">
+ <TabsList className="grid w-full grid-cols-2 md:w-[320px] p-1 bg-[#111111] border border-[#2a2a2a] rounded-xl">
  <TabsTrigger value="ideas" className="flex items-center gap-2 font-semibold text-sm">
  <Sparkles size={16} />
  Ideas
@@ -345,7 +345,7 @@ export default function Discover() {
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" size={18} />
  <input
  type="text"
- className="h-11 pl-11 pr-4 w-full bg-card backdrop-blur-md border border-border focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all rounded-xl text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground shadow-sm"
+ className="h-11 pl-11 pr-4 w-full bg-[#111111] border border-[#2a2a2a] focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all rounded-xl text-sm font-medium text-white outline-none placeholder:text-[#666666]"
  placeholder={`Search ${activeTab}...`}
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
@@ -379,27 +379,29 @@ export default function Discover() {
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
  {paginatedItems.map((item, idx) => {
  const isIdea = activeTab === 'ideas';
+ const borderHoverClass = isIdea ? 'hover:border-yellow-500/30 hover:bg-yellow-500/5' : 'hover:border-blue-500/30 hover:bg-blue-500/5';
+ const textHoverClass = isIdea ? 'group-hover:text-yellow-400' : 'group-hover:text-blue-400';
+ 
  return (
  <div
  key={item.id}
- className="group relative bg-card border border-border rounded-xl flex flex-col h-full cursor-pointer transition-all duration-300 hover:border-muted-foreground/30 hover:bg-white/[0.02] overflow-hidden shadow-sm hover:shadow-md"
+ className={cn("group relative bg-[#111111] border border-[#222222] rounded-xl flex flex-col h-full cursor-pointer transition-all duration-300 overflow-hidden", borderHoverClass)}
  onClick={() => setViewModalConfig({ open: true, item, type: activeTab })}
  >
-
  <div className="p-5 flex flex-col gap-4 flex-1">
  {/* Author row */}
  <div className="flex items-center gap-3">
  <Avatar size="sm" fallback={item.authorName?.[0] || '?'} />
  <div className="flex-1 min-w-0">
- <span className="text-sm font-bold text-foreground truncate block group-hover:text-accent transition-colors">
+ <span className={cn("text-sm font-bold text-white truncate block transition-colors", textHoverClass)}>
  {item.authorName || 'Anonymous'}
  </span>
- <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+ <span className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">
  {isIdea ? 'Idea' : 'Project'}
  </span>
  </div>
  {isIdea && item.certified && (
- <span className="flex items-center gap-1 text-[10px] font-bold text-foreground bg-secondary border border-border rounded-full px-2 py-0.5 shrink-0 shadow-sm">
+ <span className="flex items-center gap-1 text-[10px] font-bold text-[#111111] bg-yellow-400 border border-transparent rounded-full px-2 py-0.5 shrink-0 shadow-sm">
  <ShieldCheck size={10} />
  Certified
  </span>
@@ -408,10 +410,10 @@ export default function Discover() {
 
  {/* Title + description */}
  <div className="flex-1 space-y-2">
- <h3 className="text-[17px] font-bold tracking-tight text-foreground leading-snug line-clamp-2">
+ <h3 className={cn("text-[17px] font-bold tracking-tight leading-snug line-clamp-2 transition-colors", textHoverClass)}>
  {item.title}
  </h3>
- <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+ <p className="text-sm text-[#888888] line-clamp-3 leading-relaxed">
  {item.description}
  </p>
  </div>
@@ -423,7 +425,7 @@ export default function Discover() {
  {item.tags?.slice(0, 2).map((tag) => (
  <span
  key={tag}
- className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-secondary border-border text-muted-foreground group-hover:text-foreground transition-colors"
+ className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[#111111] border-[#2a2a2a] text-[#888888] group-hover:text-[#dddddd] group-hover:border-[#444444] transition-colors"
  >
  {tag}
  </span>
@@ -449,15 +451,15 @@ export default function Discover() {
  className={cn(
 "flex items-center justify-center gap-1.5 h-8 rounded-lg text-[11px] font-bold border transition-all duration-200",
  savedItems.has(item.id)
- ?"bg-foreground text-background border-transparent"
- :"bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+ ?"bg-white text-black border-transparent"
+ :"bg-transparent border-[#2a2a2a] text-[#888888] hover:bg-white/5 hover:text-white"
  )}
  >
  <BookmarkPlus size={12} /> Add
  </button>
  <button
  onClick={(e) => handleDebate(e, item)}
- className="flex items-center justify-center gap-1.5 h-8 rounded-lg text-[11px] font-bold border bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-200"
+ className="flex items-center justify-center gap-1.5 h-8 rounded-lg text-[11px] font-bold border bg-transparent border-[#2a2a2a] text-[#888888] hover:bg-white/5 hover:text-white transition-all duration-200"
  >
  <MessageSquare size={12} /> Debate
  </button>
@@ -470,7 +472,7 @@ export default function Discover() {
      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
      : collabStatus[item.userId || item.authorId] === 'pending'
      ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
-     : "bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+     : "bg-transparent border-[#2a2a2a] text-[#888888] hover:bg-white/5 hover:text-white"
  )}
  >
  <Handshake size={12} /> {collabStatus[item.userId || item.authorId] === 'accepted' ? "Collab'd" : collabStatus[item.userId || item.authorId] === 'pending' ? 'Pending' : 'Collab'}

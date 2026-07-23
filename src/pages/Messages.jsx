@@ -245,7 +245,7 @@ export default function Messages() {
  
  {/* Sidebar */}
  <div className={cn(
-"w-full md:w-80 border-r border-white/5 flex flex-col bg-card backdrop-blur-xl",
+"w-full md:w-72 lg:w-80 border-r border-white/5 flex flex-col bg-card backdrop-blur-xl",
  userId ?"hidden md:flex" :"flex"
  )}>
  <div className="px-4 py-4 border-b border-border">
@@ -372,7 +372,7 @@ export default function Messages() {
  </div>
  
  {/* Thread Feed */}
- <div className="flex-1 overflow-y-auto scrollbar-hide p-6 md:p-8 space-y-8">
+ <div className="flex-1 overflow-y-auto scrollbar-hide p-4 md:p-6 space-y-6">
  {safeTimeline.map((group) => {
  const groupMessages = Array.isArray(group?.messages) ? group.messages : [];
  return (
@@ -396,8 +396,8 @@ export default function Messages() {
  >
  <div
  className={cn(
-"max-w-[85%] sm:max-w-[70%] rounded-2xl text-sm font-medium leading-relaxed relative group/msg shadow-sm",
- (!msg.content && msgAttachments.length > 0) ?"" :"px-5 py-3",
+"max-w-[85%] sm:max-w-[70%] rounded-2xl text-[13px] md:text-sm font-medium leading-relaxed relative group/msg shadow-sm",
+ (!msg.content && msgAttachments.length > 0) ?"" :"px-4 py-2.5",
  isOwn && (msg.content || msgAttachments.length === 0)
  ?"bg-accent text-accent-foreground rounded-br-sm" 
  :"",
@@ -473,8 +473,8 @@ export default function Messages() {
  </div>
  
  {/* Thread Composer */}
- <div className="p-4 md:p-6 border-t border-border bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
- <div className="max-w-4xl mx-auto space-y-3">
+ <div className="p-3 md:p-4 border-t border-border bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
+ <div className="max-w-4xl mx-auto space-y-2">
  {attachments.length > 0 && (
  <div className="flex flex-wrap gap-2 mb-3">
  {attachments.map((file, index) => (
@@ -500,11 +500,11 @@ export default function Messages() {
  <form className="flex items-center gap-2 bg-card backdrop-blur-md border border-border focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 rounded-2xl p-1.5 transition-all shadow-sm" onSubmit={handleSendMessage}>
  <button
  type="button"
- className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-xl transition-colors"
+ className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-lg transition-colors"
  onClick={() => fileInputRef.current?.click()}
  disabled={uploading}
  >
- <Paperclip size={20} />
+ <Paperclip size={18} />
  </button>
  <input
  ref={fileInputRef}
@@ -523,10 +523,10 @@ export default function Messages() {
  <div className="relative">
  <button
  type="button"
- className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-xl transition-colors"
+ className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-lg transition-colors"
  onClick={() => setEmojiOpen((prev) => !prev)}
  >
- <Smile size={20} />
+ <Smile size={18} />
  </button>
  {emojiOpen && (
  <div className="absolute bottom-[120%] right-0 z-50 w-64 rounded-2xl border border-border bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-4 shadow-2xl">
@@ -551,7 +551,7 @@ export default function Messages() {
  <Button
  type="submit"
  variant="primary"
- className="h-10 w-10 p-0 flex items-center justify-center rounded-xl shadow-none"
+ className="h-9 w-9 p-0 flex items-center justify-center rounded-lg shadow-none"
  disabled={!newMessage.trim() && attachments.length === 0}
  >
  <Send size={16} />
@@ -561,13 +561,13 @@ export default function Messages() {
  </div>
  </>
  ) : (
- <div className="flex flex-col items-center justify-center p-16 text-center space-y-6 bg-secondary/50 w-full h-full">
- <div className="w-20 h-20 bg-card rounded-3xl flex items-center justify-center text-muted-foreground border border-border shadow-sm">
- <MessageSquare size={32} />
+ <div className="flex flex-col items-center justify-center p-10 text-center space-y-4 bg-secondary/50 w-full h-full">
+ <div className="w-16 h-16 bg-card rounded-2xl flex items-center justify-center text-muted-foreground border border-border shadow-sm">
+ <MessageSquare size={28} />
  </div>
- <div className="space-y-2">
- <h3 className="text-2xl font-bold tracking-tight text-foreground">Select a conversation</h3>
- <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+ <div className="space-y-1">
+ <h3 className="text-xl font-bold tracking-tight text-foreground">Select a conversation</h3>
+ <p className="text-muted-foreground max-w-sm text-[13px] md:text-sm leading-relaxed">
  Choose a connection from the sidebar to view messages and collaborate.
  </p>
  </div>
