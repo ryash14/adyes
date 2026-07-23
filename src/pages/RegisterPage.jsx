@@ -130,7 +130,7 @@ export default function RegisterPage() {
 
     <div className="relative flex py-2 items-center justify-center mb-4">
       <div className="absolute inset-x-0 top-1/2 border-t border-[#222222] -z-10" />
-      <span className="bg-[#111111] px-4 relative z-10 text-[13px] text-[#888888]">
+      <span className="bg-background px-4 relative z-10 text-[13px] text-muted-foreground">
         or
       </span>
     </div>
@@ -173,7 +173,7 @@ export default function RegisterPage() {
 
       <button
         type="submit"
-        className="w-full mt-2 h-11 bg-emerald-500 text-white font-semibold text-[14px] rounded-full hover:bg-emerald-400 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
+        className="w-full mt-2 h-11 bg-white text-black font-semibold text-[14px] rounded-full hover:bg-zinc-200 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
         disabled={loading}
       >
         {loading ? (

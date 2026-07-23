@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import Toast from './components/Toast';
 import { lazy, Suspense, useEffect } from 'react';
+import LoadingState from './components/LoadingState';
 import './index.css';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -19,11 +20,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const PostDetails = lazy(() => import('./pages/PostDetails'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-const PageLoader = () => (
- <div className="page-loader">
- <div className="spinner spinner-lg" />
- </div>
-);
+const PageLoader = () => <LoadingState />;
 
 const ScrollToHash = () => {
  const { hash, pathname } = useLocation();

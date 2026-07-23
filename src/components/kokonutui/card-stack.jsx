@@ -1,0 +1,233 @@
+/**
+ * @author: @dorianbaffier
+ * @description: Card Stack
+ * @version: 1.1.0
+ * @date: 2025-06-26
+ * @license: MIT
+ * @website: https://kokonutui.com
+ * @github: https://github.com/kokonut-labs/kokonutui
+ */
+
+import { motion, useReducedMotion } from "motion/react";
+
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+const products = [
+  {
+    id: "idea-validation",
+    title: "Idea Validation",
+    subtitle: "Get feedback instantly",
+    description:
+      "Share your startup ideas and get them certified by industry experts and mentors.",
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&auto=format&fit=crop&q=80",
+    specs: [
+      { label: "Community", value: "Global" },
+      { label: "Feedback", value: "Real-time" },
+      { label: "Certification", value: "Expert" },
+      { label: "Cost", value: "Free" },
+    ],
+  },
+  {
+    id: "mentor-match",
+    title: "Find Mentors",
+    subtitle: "Learn from the best",
+    description:
+      "Connect with seasoned founders and engineers to guide your startup journey.",
+    image:
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80",
+    specs: [
+      { label: "Network", value: "Verified" },
+      { label: "Matching", value: "AI-driven" },
+      { label: "Sessions", value: "1-on-1" },
+      { label: "Quality", value: "Top-tier" },
+    ],
+  },
+  {
+    id: "build-team",
+    title: "Build Teams",
+    subtitle: "Find your co-founders",
+    description:
+      "Discover talented developers, designers, and marketers looking for a project.",
+    image:
+      "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&auto=format&fit=crop&q=80",
+    specs: [
+      { label: "Pool", value: "10,000+" },
+      { label: "Skills", value: "Diverse" },
+      { label: "Collab", value: "Seamless" },
+      { label: "Success", value: "High" },
+    ],
+  },
+  {
+    id: "global-reach",
+    title: "Global Reach",
+    subtitle: "Launch worldwide",
+    description:
+      "Showcase your open-source projects to a global audience of builders and investors.",
+    image:
+      "https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?w=800&auto=format&fit=crop&q=80",
+    specs: [
+      { label: "Countries", value: "150+" },
+      { label: "Audience", value: "Builders" },
+      { label: "Funding", value: "Accessible" },
+      { label: "Impact", value: "Massive" },
+    ],
+  },
+];
+
+const CARD_WIDTH = 320;
+const CARD_OVERLAP = 240;
+
+const Card = ({
+  product,
+  index,
+  totalCards,
+  isExpanded,
+  reducedMotion
+}) => {
+  const centerOffset = (totalCards - 1) * 5;
+  const defaultX = index * 10 - centerOffset;
+  const defaultY = index * 2;
+  const defaultRotate = index * 1.5;
+
+  const totalExpandedWidth =
+    CARD_WIDTH + (totalCards - 1) * (CARD_WIDTH - CARD_OVERLAP);
+  const expandedCenterOffset = totalExpandedWidth / 2;
+
+  const spreadX =
+    index * (CARD_WIDTH - CARD_OVERLAP) - expandedCenterOffset + CARD_WIDTH / 2;
+  const spreadRotate = index * 5 - (totalCards - 1) * 2.5;
+
+  const collapsedPose = {
+    x: defaultX,
+    y: defaultY,
+    rotate: reducedMotion ? 0 : defaultRotate,
+    scale: 1,
+  };
+
+  const expandedPose = {
+    x: spreadX,
+    y: 0,
+    rotate: reducedMotion ? 0 : spreadRotate,
+    scale: 1,
+  };
+
+  const isSvg = product.image.endsWith(".svg");
+
+  return (
+    <motion.div
+      animate={{
+        ...(isExpanded ? expandedPose : collapsedPose),
+        zIndex: totalCards - index,
+      }}
+      className={cn(
+        "absolute inset-0 w-full rounded-2xl p-6",
+        "bg-white/60 dark:bg-neutral-900/60",
+        "border border-white/20 dark:border-neutral-800/40",
+        "backdrop-blur-xl backdrop-saturate-150",
+        "shadow-[0_8px_20px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_20px_rgb(0,0,0,0.3)]",
+        "hover:border-white/30 dark:hover:border-neutral-700/30",
+        "hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgb(0,0,0,0.4)]",
+        "transition-[border-color,box-shadow] duration-300 ease-out",
+        "transform-gpu overflow-hidden"
+      )}
+      initial={collapsedPose}
+      style={{
+        maxWidth: `${CARD_WIDTH}px`,
+        left: "50%",
+        marginLeft: `-${CARD_WIDTH / 2}px`,
+      }}
+      transition={
+        reducedMotion
+          ? { duration: 0.2, ease: "easeOut" }
+          : {
+              type: "spring",
+              stiffness: 220,
+              damping: 28,
+              mass: 1,
+              delay: isExpanded ? index * 0.04 : 0,
+            }
+      }>
+      <div className="relative z-10">
+        <dl className="mb-4 grid grid-cols-4 justify-center gap-2">
+          {product.specs.map((spec) => (
+            <div
+              className="flex flex-col items-start text-left text-[10px]"
+              key={spec.label}>
+              <dd className="w-full text-left font-medium text-gray-500 dark:text-gray-400">
+                {spec.value}
+              </dd>
+              <dt className="mb-0.5 w-full text-left text-gray-900 dark:text-gray-100">
+                {spec.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+
+        <div
+          className={cn(
+            "relative aspect-[16/11] w-full overflow-hidden rounded-lg",
+            "bg-neutral-100 dark:bg-neutral-900",
+            "border border-neutral-200/50 dark:border-neutral-700/50",
+            "shadow-inner"
+          )}>
+          <img
+            alt={product.description}
+            className="w-full h-full object-cover"
+            src={product.image} />
+        </div>
+
+        <div className="mt-4">
+          <div className="space-y-1">
+            <span
+              className="block text-left font-bold text-3xl text-gray-900 tracking-tight dark:text-white">
+              {product.title}
+            </span>
+            <span
+              className="block text-left font-semibold text-3xl text-gray-500 tracking-tight dark:text-gray-400">
+              {product.subtitle}
+            </span>
+          </div>
+          <p className="mt-2 text-left text-gray-500 text-sm dark:text-gray-400">
+            {product.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default function CardStackExample({
+  className
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const reducedMotion = useReducedMotion() ?? false;
+
+  const handleToggle = () => setIsExpanded((prev) => !prev);
+
+  return (
+    <button
+      aria-expanded={isExpanded}
+      aria-label={isExpanded ? "Collapse card stack" : "Expand card stack"}
+      className={cn(
+        "relative mx-auto cursor-pointer",
+        "min-h-[440px] w-full max-w-[90vw]",
+        "md:max-w-[1200px]",
+        "appearance-none border-0 bg-transparent p-0",
+        "mb-8 flex items-center justify-center",
+        className
+      )}
+      onClick={handleToggle}
+      type="button">
+      {products.map((product, index) => (
+        <Card
+          index={index}
+          isExpanded={isExpanded}
+          key={product.id}
+          product={product}
+          reducedMotion={reducedMotion}
+          totalCards={products.length} />
+      ))}
+    </button>
+  );
+}

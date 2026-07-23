@@ -1,103 +1,71 @@
 import React from 'react';
-import { Fade, GlowCard } from '../ui/Animations';
-import { ArrowUpRight } from 'lucide-react';
+import { Fade } from '../ui/Animations';
+import CardFlip from '../kokonutui/card-flip';
+import { LiquidGlassCard } from '../kokonutui/liquid-glass-card';
 
 export const FeatureExtensionsSection = () => {
   return (
-    <section id="features" className="py-24 px-6 bg-[#000000] relative overflow-hidden">
+    <section className="py-32 px-6 bg-background relative overflow-hidden">
       
-      {/* Background glow */}
-      <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent blur-[120px] pointer-events-none" />
+      {/* Premium Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] bg-accent/5 blur-[150px] pointer-events-none rounded-full" />
 
-      <div className="max-w-[1200px] mx-auto relative z-10">
-        
+      <div className="max-w-[1200px] mx-auto">
         <Fade>
-          <div className="mb-16">
-            <h2 className="text-[40px] md:text-[56px] font-bold text-white tracking-tighter leading-[1.1] mb-6">
-              Unmatched productivity
+          <div className="text-center mb-24">
+            <h2 className="text-[32px] md:text-[48px] font-bold text-foreground tracking-tighter leading-tight mb-4">
+              Everything you need to build.
             </h2>
-            <p className="text-[#888888] text-[18px] leading-[1.6] max-w-2xl font-medium tracking-tight">
-              Adyes is a process, project, time, and knowledge management platform that provides amazing collaboration opportunities for developers and product teams alike.
+            <p className="text-muted-foreground text-[18px] md:text-[20px] leading-[1.6] font-medium tracking-tight max-w-[600px] mx-auto">
+              A complete ecosystem designed to take your ideas from raw concepts to verified startups.
             </p>
           </div>
         </Fade>
 
-        {/* BENTO BOX GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Feature Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
           
-          {/* Box 1 - Wide */}
-          <Fade className="md:col-span-2" delay={0.1}>
-            <div className="group relative h-[380px] rounded-3xl bg-[#0a0a0a] border border-white/10 overflow-hidden flex flex-col justify-end p-8 hover:border-white/20 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80 z-10" />
-              
-              {/* Abstract Visual (Keyboard shortcuts) */}
-              <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 flex items-center justify-center">
-                 <div className="grid grid-cols-3 gap-4 rotate-12 scale-150">
-                    <div className="w-16 h-16 rounded-xl border border-white/20 flex items-center justify-center bg-white/5"><span className="text-white/40 font-mono text-xl">⌘</span></div>
-                    <div className="w-16 h-16 rounded-xl border border-white/20 flex items-center justify-center bg-white/5"><span className="text-white/40 font-mono text-xl">K</span></div>
-                 </div>
-              </div>
-
-              <div className="relative z-20">
-                <h3 className="text-white text-2xl font-bold mb-2">Keyboard shortcuts.</h3>
-                <p className="text-[#888888] text-lg max-w-md">Work efficiently with instant access to common actions. Never leave your keyboard.</p>
-              </div>
-            </div>
+          <Fade delay={0.1} className="w-full flex justify-center">
+            <CardFlip 
+              title="Expert Mentorship"
+              subtitle="Get industry validation"
+              description="Connect with leading experts who will review, refine, and certify your startup concepts."
+              features={["Concept Review", "Technical Guidance", "Mentor Certification", "Direct Feedback"]}
+            />
           </Fade>
 
-          {/* Box 2 - Standard */}
-          <Fade className="md:col-span-1" delay={0.2}>
-            <div className="group relative h-[380px] rounded-3xl bg-[#0a0a0a] border border-white/10 overflow-hidden flex flex-col justify-end p-8 hover:border-white/20 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80 z-10" />
-              
-              {/* Abstract visual */}
-              <div className="absolute top-12 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full border border-emerald-500/20 bg-emerald-500/5 group-hover:scale-110 transition-transform duration-700" />
-              
-              <div className="relative z-20">
-                <h3 className="text-white text-2xl font-bold mb-2">Team Planner.</h3>
-                <p className="text-[#888888] text-lg">Keep track of the bigger picture by viewing all tasks in one place.</p>
-              </div>
-            </div>
+          <Fade delay={0.2} className="w-full flex justify-center">
+            <CardFlip 
+              title="Active Projects"
+              subtitle="Build in public"
+              description="Transform certified ideas into active projects. Showcase your roadmap and milestones."
+              features={["Public Roadmaps", "Progress Tracking", "Version Control Link", "Milestone Updates"]}
+            />
           </Fade>
 
-          {/* Box 3 - Standard */}
-          <Fade className="md:col-span-1" delay={0.3}>
-            <div className="group relative h-[380px] rounded-3xl bg-[#0a0a0a] border border-white/10 overflow-hidden flex flex-col justify-end p-8 hover:border-white/20 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80 z-10" />
-              
-              {/* Abstract visual */}
-              <div className="absolute top-8 right-8 flex gap-2 opacity-30 group-hover:opacity-60 transition-opacity">
-                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center"><div className="w-4 h-4 bg-white rounded-full" /></div>
-                <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center"><div className="w-4 h-4 bg-white rounded-full" /></div>
-              </div>
-
-              <div className="relative z-20">
-                <h3 className="text-white text-2xl font-bold mb-2">Notifications.</h3>
-                <p className="text-[#888888] text-lg">Keep up to date with any changes instantly across the network.</p>
-              </div>
-            </div>
-          </Fade>
-
-          {/* Box 4 - Wide */}
-          <Fade className="md:col-span-2" delay={0.4}>
-            <div className="group relative h-[380px] rounded-3xl bg-[#0a0a0a] border border-white/10 overflow-hidden flex flex-col justify-end p-8 hover:border-white/20 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80 z-10" />
-              
-              {/* Abstract Visual (Timeline) */}
-              <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 flex flex-col justify-center px-16 gap-4">
-                 <div className="h-8 rounded bg-white/10 w-full" />
-                 <div className="h-8 rounded bg-white/10 w-3/4 ml-12" />
-                 <div className="h-8 rounded bg-white/10 w-1/2 ml-24" />
-              </div>
-
-              <div className="relative z-20">
-                <h3 className="text-white text-2xl font-bold mb-2">Time-blocking.</h3>
-                <p className="text-[#888888] text-lg max-w-md">Transform daily tasks into structured time blocks for focused productivity.</p>
-              </div>
-            </div>
+          <Fade delay={0.3} className="w-full flex justify-center">
+            <CardFlip 
+              title="Team Discovery"
+              subtitle="Find your co-founders"
+              description="Recruit the perfect technical or business co-founders from a network of verified builders."
+              features={["Skill Matching", "Role Requirements", "Team Assembly", "Direct Messaging"]}
+            />
           </Fade>
 
         </div>
+
+        {/* Liquid Glass Showcase */}
+        <Fade delay={0.5} yOffset={40} className="mt-32 w-full max-w-[800px] mx-auto">
+          <LiquidGlassCard className="rounded-3xl border border-border/60 bg-card p-8 md:p-12 shadow-2xl flex flex-col items-center text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              Stop building in isolation.
+            </h3>
+            <p className="text-muted-foreground text-lg mb-8 max-w-[500px]">
+              Join thousands of founders and engineers who are already building the next generation of startups on Adyes.
+            </p>
+          </LiquidGlassCard>
+        </Fade>
+
       </div>
     </section>
   );

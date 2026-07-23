@@ -6,7 +6,9 @@ import { Footer } from '@/components/layout/Footer';
 
 // Sections
 import { HeroSection } from '@/components/sections/HeroSection';
+import { MarqueeSection } from '@/components/sections/MarqueeSection';
 import { FeatureExtensionsSection } from '@/components/sections/FeatureExtensionsSection';
+import { HighlightCardsSection } from '@/components/sections/HighlightCardsSection';
 import { CapabilitiesSection } from '@/components/sections/CapabilitiesSection';
 import { StatsSection } from '@/components/sections/StatsSection';
 import { CTASection } from '@/components/sections/CTASection';
@@ -22,10 +24,12 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden selection:bg-white/20 font-sans">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-accent/20 font-sans">
       <Navbar />
       <main>
         <HeroSection navigate={navigate} />
+        <HighlightCardsSection />
+        <MarqueeSection />
         <FeatureExtensionsSection />
         <CapabilitiesSection />
         <StatsSection />

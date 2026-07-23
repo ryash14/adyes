@@ -389,7 +389,7 @@ export default function ProfileSetup() {
   <Code size={16} /> GitHub Username
   </label>
   <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
-  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  <div className="px-4 flex items-center border-r border-border bg-secondary text-muted-foreground text-[14px]">
   github.com/
   </div>
   <input
@@ -407,7 +407,7 @@ export default function ProfileSetup() {
   <Briefcase size={16} /> LinkedIn Username
   </label>
   <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
-  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  <div className="px-4 flex items-center border-r border-border bg-secondary text-muted-foreground text-[14px]">
   linkedin.com/in/
   </div>
   <input
@@ -425,7 +425,7 @@ export default function ProfileSetup() {
   <MessageCircle size={16} /> Twitter / X Username
   </label>
   <div className="flex h-11 w-full rounded-xl bg-[#1c1c1c] focus-within:ring-1 focus-within:ring-white overflow-hidden transition-all">
-  <div className="px-4 flex items-center border-r border-[#2a2a2a] bg-[#111111] text-[#888888] text-[14px]">
+  <div className="px-4 flex items-center border-r border-border bg-secondary text-muted-foreground text-[14px]">
   twitter.com/
   </div>
   <input
