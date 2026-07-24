@@ -71,7 +71,7 @@ export default function LoginPage() {
       footer={
         <span>
           Don't have an account?{' '}
-          <Link to="/register" className="text-white hover:underline transition-all">
+          <Link to="/register" className="text-foreground hover:underline transition-all">
             Sign up
           </Link>
         </span>
@@ -173,7 +173,7 @@ export default function LoginPage() {
 
       <button
         type="submit"
-        className="w-full h-11 bg-white text-black font-semibold text-[14px] rounded-full hover:bg-zinc-200 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
+        className="w-full h-11 bg-primary text-primary-foreground font-semibold text-[14px] rounded-full hover:bg-primary/90 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
         disabled={loading}
       >
         {loading ? (
@@ -183,8 +183,8 @@ export default function LoginPage() {
         ) : 'Continue'}
       </button>
 
-      <p className="text-[11px] text-[#888888] text-center mt-4">
-        By continuing, you agree to adyes's <span className="underline cursor-pointer hover:text-white">Terms</span> and <span className="underline cursor-pointer hover:text-white">Privacy</span>.
+      <p className="text-[11px] text-muted-foreground text-center mt-4">
+        By continuing, you agree to adyes's <span className="underline cursor-pointer hover:text-foreground">Terms</span> and <span className="underline cursor-pointer hover:text-foreground">Privacy</span>.
       </p>
     </motion.form>
   </AuthLayout>

@@ -16,7 +16,7 @@ export default function AuthLayout({
   const pct = progress ? Math.round((progress.current / progress.total) * 100) : 0;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 md:p-12 relative selection:bg-white/20 selection:text-white bg-background">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 md:p-12 relative selection:bg-accent/20 selection:text-foreground bg-background">
       <Particles
         className="absolute inset-0 z-0"
         quantity={150}
