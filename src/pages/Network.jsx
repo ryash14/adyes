@@ -197,7 +197,7 @@ export default function Network() {
              return (
                <div
                  key={p.id}
-                 className="bg-card/40 backdrop-blur-md border border-border/60 rounded-2xl flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:border-emerald-500/30 hover:bg-emerald-500/5 relative overflow-hidden shadow-sm hover:shadow-md"
+                 className="bg-card border border-border rounded-xl flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:border-emerald-500/30 hover:bg-emerald-500/5 relative overflow-hidden shadow-sm hover:shadow-md"
                  onClick={() => navigate(`/profile/${p.id}`)}
                >
                  <div className="p-6 w-full flex flex-col items-center flex-1">

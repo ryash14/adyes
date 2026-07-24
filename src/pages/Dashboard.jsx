@@ -158,7 +158,7 @@ export default function Dashboard() {
             className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/50"
           >
             <div className="max-w-[70%]">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-border/50 bg-secondary/30 text-muted-foreground text-[10px] font-bold mb-4 tracking-widest uppercase shadow-sm">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-border bg-secondary text-muted-foreground text-[10px] font-bold mb-4 tracking-widest uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                 Workspace Overview
               </div>
@@ -190,7 +190,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 onClick={() => navigate(s.key === 'connections' ? '/network' : `/discover?tab=${s.key}`)} 
-                className="cursor-pointer group relative overflow-hidden h-full bg-card/40 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-border/60 hover:border-border transition-all flex flex-col justify-between"
+                className="cursor-pointer group relative overflow-hidden h-full bg-card rounded-xl p-6 border border-border hover:border-foreground/20 transition-all flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between w-full mb-6 relative z-10">
                   <div className="flex items-center gap-3">
@@ -214,7 +214,7 @@ export default function Dashboard() {
                       )}
                     </p>
                   </div>
-                  <p className="text-[11px] font-semibold text-muted-foreground mt-2 bg-secondary/50 inline-block px-2 py-1 rounded-md">
+                  <p className="text-[11px] font-semibold text-muted-foreground mt-2 bg-secondary inline-block px-2 py-1 rounded-md">
                     {s.trend}
                   </p>
                 </div>
@@ -239,7 +239,7 @@ export default function Dashboard() {
             >
               {/* Mentor Requests Table */}
               {profile?.role === 'mentor' && pendingIdeas.length > 0 && (
-                <div className="rounded-2xl border border-emerald-500/20 bg-card/40 backdrop-blur-sm shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-emerald-500/20 bg-card overflow-hidden">
                   <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/10 bg-emerald-500/5">
                     <div>
                       <h2 className="text-sm font-bold text-emerald-500 flex items-center gap-2">
@@ -269,8 +269,8 @@ export default function Dashboard() {
               )}
 
               {/* Recent Ideas Data Table */}
-              <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <div className="rounded-xl border border-border bg-card overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
                   <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
                     <FileText size={16} className="text-muted-foreground" /> Recent Ideas
                   </h2>
@@ -281,7 +281,7 @@ export default function Dashboard() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
-                    <thead className="text-[10px] text-muted-foreground uppercase bg-secondary/30 border-b border-border/50 tracking-widest">
+                    <thead className="text-[10px] text-muted-foreground uppercase bg-secondary/50 border-b border-border tracking-widest">
                       <tr>
                         <th className="px-6 py-3 font-semibold">Project Name</th>
                         <th className="px-6 py-3 font-semibold">Status</th>
@@ -289,7 +289,7 @@ export default function Dashboard() {
                         <th className="px-6 py-3 font-semibold text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border/50">
+                    <tbody className="divide-y divide-border">
                       {loading ? (
                         Array(4).fill(0).map((_, i) => (
                           <tr key={i} className="animate-pulse">
@@ -301,7 +301,7 @@ export default function Dashboard() {
                         ))
                       ) : recentIdeas.length > 0 ? (
                         recentIdeas.map((idea) => (
-                          <tr key={idea.id} className="hover:bg-secondary/20 transition-colors group">
+                          <tr key={idea.id} className="hover:bg-secondary/50 transition-colors group">
                             <td className="px-6 py-4">
                               <p className="font-bold text-foreground text-sm truncate max-w-[200px]">{idea.title}</p>
                               <p className="text-xs text-muted-foreground truncate max-w-[200px] mt-0.5">{idea.description}</p>
@@ -312,7 +312,7 @@ export default function Dashboard() {
                                   <Sparkles size={10} /> Certified
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-secondary text-muted-foreground text-[10px] font-bold border border-border/50">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-secondary text-muted-foreground text-[10px] font-bold border border-border">
                                   Pending
                                 </span>
                               )}
@@ -352,7 +352,7 @@ export default function Dashboard() {
             >
               {/* Profile Completion Card */}
               {(!profile?.socialLinks?.github && !profile?.socialLinks?.linkedin) ? (
-                <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 relative overflow-hidden shadow-sm">
+                <div className="rounded-xl border border-accent/20 bg-accent/5 p-6 relative overflow-hidden">
                   <div className="relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-background border border-accent/20 flex items-center justify-center text-accent mb-4 shadow-sm">
                       <Rocket size={18} />
@@ -365,7 +365,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 relative overflow-hidden shadow-sm">
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-6 relative overflow-hidden">
                   <div className="relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-background border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-4 shadow-sm">
                       <CheckCircle2 size={18} />
@@ -377,7 +377,7 @@ export default function Dashboard() {
               )}
 
               {/* Activity Feed (Mocked for premium feel) */}
-              <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm shadow-sm p-6">
+              <div className="rounded-xl border border-border bg-card p-6">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
                   <Activity size={14} /> Activity Feed
                 </p>
@@ -389,7 +389,7 @@ export default function Dashboard() {
                         <div className={cn("flex items-center justify-center w-6 h-6 rounded-full border-2 border-background shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10", activity.color)}>
                           <activity.icon size={10} strokeWidth={3} />
                         </div>
-                        <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-border/50 bg-secondary/20 shadow-sm ml-4 md:ml-0 hover:bg-secondary/40 transition-colors">
+                        <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-border bg-secondary/50 ml-4 md:ml-0 hover:bg-secondary transition-colors">
                           <p className="text-xs font-semibold text-foreground">{activity.title}</p>
                           <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{activity.description}</p>
                         </div>

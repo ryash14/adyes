@@ -367,11 +367,10 @@ export default function Discover() {
              const isIdea = activeTab === 'ideas';
              const borderHoverClass = isIdea ? 'hover:border-accent/50' : 'hover:border-blue-500/50';
              const textHoverClass = isIdea ? 'group-hover:text-accent' : 'group-hover:text-blue-500';
-             
              return (
                <div
                  key={item.id}
-                 className={cn("group relative bg-card/40 backdrop-blur-md border border-border/60 rounded-2xl flex flex-col h-full cursor-pointer transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md", borderHoverClass)}
+                 className={cn("group relative bg-card border border-border rounded-xl flex flex-col h-full cursor-pointer transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md hover:border-foreground/20")}
                  onClick={() => setViewModalConfig({ open: true, item, type: activeTab })}
                >
                  <div className="p-6 flex flex-col gap-4 flex-1">

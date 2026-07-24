@@ -64,20 +64,9 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 pt-4 px-4 transition-all duration-300 ${scrolled ? 'pt-2' : 'pt-6'}`}>
-      <motion.nav 
-        className="mx-auto max-w-[1200px]"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div 
-          className={`
-            h-16 px-4 flex items-center justify-between rounded-full
-            bg-background/70 backdrop-blur-xl border border-border shadow-sm
-            transition-all duration-500
-          `}
-        >
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+      <div className="mx-auto max-w-[1400px]">
+        <div className="h-14 px-4 flex items-center justify-between">
           {/* Left: Logo */}
           <Link to="/" className="flex items-center pl-2 group shrink-0">
             <span className="text-[20px] font-bold tracking-tight transition-transform duration-300 group-hover:scale-95">
@@ -134,7 +123,7 @@ export function Navbar() {
             </div>
           </div>
         </div>
-      </motion.nav>
+      </div>
     </header>
   );
 }

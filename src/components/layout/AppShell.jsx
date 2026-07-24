@@ -62,10 +62,10 @@ export default function AppShell({ children, fullBleed = false }) {
 
   return (
     <div className={cn("bg-background font-sans antialiased text-foreground selection:bg-accent selection:text-black flex flex-col", isMessages ? "h-[100dvh] overflow-hidden" : "min-h-screen")}>
-      {/* Top Navigation Bar - Floating Pill Style */}
-      <header className="sticky top-0 z-50 pt-4 px-4 pb-2 transition-all duration-300">
+      {/* Top Navigation Bar - Flat Minimalist Style */}
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="mx-auto max-w-[1400px]">
-          <div className="flex h-16 items-center justify-between px-4 rounded-full bg-background/70 backdrop-blur-xl border border-border shadow-sm transition-all duration-500">
+          <div className="flex h-14 items-center justify-between px-4">
             {/* Left: Logo */}
             <div className="flex items-center w-auto md:w-[200px]">
               {/* Mobile Menu Toggle */}

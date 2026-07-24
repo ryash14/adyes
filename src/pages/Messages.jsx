@@ -245,7 +245,7 @@ export default function Messages() {
  
  {/* Sidebar */}
  <div className={cn(
-"w-full md:w-72 lg:w-80 border-r border-border/60 flex flex-col bg-card/40 backdrop-blur-md",
+"w-full md:w-72 lg:w-80 border-r border-border flex flex-col bg-card",
  userId ?"hidden md:flex" :"flex"
  )}>
  <div className="px-4 py-4 border-b border-border">
@@ -254,7 +254,7 @@ export default function Messages() {
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" size={16} />
  <input
  type="text"
- className="h-11 pl-11 pr-4 w-full bg-card/40 backdrop-blur-md border border-border/60 focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all rounded-xl font-medium text-sm text-foreground outline-none placeholder:text-muted-foreground shadow-sm"
+ className="h-11 pl-11 pr-4 w-full bg-background border border-border focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all rounded-xl font-medium text-sm text-foreground outline-none placeholder:text-muted-foreground shadow-sm"
  placeholder="Search conversations..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
@@ -320,7 +320,7 @@ export default function Messages() {
  {userId && selectedConnection ? (
  <>
  {/* Thread Header */}
- <div className="h-20 border-b border-border/60 flex items-center justify-between px-6 bg-card/40 backdrop-blur-md sticky top-0 z-10">
+ <div className="h-20 border-b border-border flex items-center justify-between px-6 bg-background sticky top-0 z-10">
  <div className="flex items-center gap-4">
  <button
  type="button"
@@ -348,7 +348,7 @@ export default function Messages() {
  tabIndex="0"
  >
  <MoreHorizontal size={20} />
- <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-border bg-card backdrop-blur-xl text-foreground shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+ <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-border bg-card shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
  <div className="p-1 flex flex-col">
  <button className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg hover:bg-white/10 hover:text-accent transition-colors" onClick={async () => {
  const newAlias = prompt("Enter a nickname for this connection:", selectedConnection.alias || selectedConnection.user?.displayName);
@@ -378,9 +378,9 @@ export default function Messages() {
  return (
  <div key={group.date} className="space-y-6">
  <div className="flex items-center gap-4">
- <div className="h-px flex-1 bg-white/5" />
+ <div className="h-px flex-1 bg-border" />
  <span className="text-[10px] font-semibold text-muted-foreground">{group.dateLabel}</span>
- <div className="h-px flex-1 bg-white/5" />
+ <div className="h-px flex-1 bg-border" />
  </div>
  {groupMessages.map((msg) => {
  const isOwn = msg.fromUserId === user?.uid;
@@ -473,14 +473,14 @@ export default function Messages() {
  </div>
  
  {/* Thread Composer */}
- <div className="p-3 md:p-4 border-t border-border/60 bg-card/40 backdrop-blur-md">
+ <div className="p-3 md:p-4 border-t border-border bg-background">
  <div className="max-w-4xl mx-auto space-y-2">
  {attachments.length > 0 && (
  <div className="flex flex-wrap gap-2 mb-3">
  {attachments.map((file, index) => (
  <div
  key={`${file.url}-${index}`}
- className="inline-flex items-center gap-2 rounded-xl border border-border bg-card backdrop-blur-md px-3 py-1.5 text-xs font-medium shadow-sm"
+ className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-medium shadow-sm"
  >
  <span className="max-w-[160px] truncate">{file.name || 'Attachment'}</span>
  <button
@@ -497,7 +497,7 @@ export default function Messages() {
  {uploadError && (
  <div className="text-xs font-medium text-destructive bg-destructive/10 px-3 py-2 rounded-lg border border-destructive/20 inline-block mb-2">{uploadError}</div>
  )}
- <form className="flex items-center gap-2 bg-background/50 backdrop-blur-md border border-border/60 focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 rounded-2xl p-1.5 transition-all shadow-sm" onSubmit={handleSendMessage}>
+ <form className="flex items-center gap-2 bg-card border border-border focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 rounded-2xl p-1.5 transition-all shadow-sm" onSubmit={handleSendMessage}>
  <button
  type="button"
  className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-lg transition-colors"
