@@ -2,7 +2,7 @@ import { cn } from '../../utils/cn';
 
 export function PageContainer({ children, className = '' }) {
  return (
- <div className={cn("w-[90%] max-w-[1400px] mx-auto py-10", className)}>
+ <div className={cn("w-[80%] max-w-[1400px] mx-auto py-10", className)}>
  {children}
  </div>
  );

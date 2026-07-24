@@ -270,7 +270,7 @@
   }
 
   .container {
-    @apply mx-auto w-[90%] max-w-[1400px];
+    @apply mx-auto w-[80%] max-w-[1400px];
   }
 
   .section-title {
