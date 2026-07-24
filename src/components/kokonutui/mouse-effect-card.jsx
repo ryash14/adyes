@@ -10,8 +10,8 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
 const SPRING_CONFIG = { stiffness: 300, damping: 30, mass: 0.5 };

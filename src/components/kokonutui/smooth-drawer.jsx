@@ -11,7 +11,7 @@
 import { Menu, Lightbulb, Rocket, Users, Network } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import {
   Drawer,
   DrawerClose,

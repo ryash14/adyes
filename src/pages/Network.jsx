@@ -11,7 +11,7 @@ import LoadingState from '../components/LoadingState';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { formatRole } from '../utils/display';
 import { cn } from '../utils/cn';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import Text3DFlip from '../components/ui/text-3d-flip';
 
 export default function Network() {

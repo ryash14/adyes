@@ -11,8 +11,8 @@
 import { Check, ChevronRight, User2 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 

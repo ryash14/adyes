@@ -14,7 +14,7 @@ import { cn } from '../utils/cn';
 import { useAuth } from '../hooks/useAuth';
 import ContentModal from '../components/ContentModal';
 import ViewDetailsModal from '../components/ViewDetailsModal';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import toast from 'react-hot-toast';
 import Text3DFlip from '../components/ui/text-3d-flip';
 

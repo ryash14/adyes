@@ -10,7 +10,7 @@ import {
 import AppShell from '../components/layout/AppShell';
 import { PageContainer } from '../components/layout/PageContainer';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { cn } from '../utils/cn';
 import { RainbowButton } from '../components/ui/rainbow-button';
 import { WarpBackground } from '../components/ui/warp-background';

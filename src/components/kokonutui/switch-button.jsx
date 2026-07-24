@@ -10,7 +10,7 @@
 
 import { Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 export default function SwitchButton({
