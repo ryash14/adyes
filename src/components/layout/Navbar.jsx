@@ -8,10 +8,10 @@ import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import SlideTextButton from '@/components/kokonutui/slide-text-button';
 
 const navItems = [
-  { name: 'Ideas', href: '/discover?tab=ideas' },
-  { name: 'Projects', href: '/discover?tab=projects' },
-  { name: 'Mentors', href: '/discover?tab=mentors' },
+  { name: 'Dashboard', href: '/dashboard' },
+  { name: 'Discover', href: '/discover' },
   { name: 'Network', href: '/network' },
+  { name: 'Messages', href: '/messages' },
 ];
 
 const NavLinks = () => {

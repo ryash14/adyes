@@ -13,6 +13,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '../utils/cn';
 import { RainbowButton } from '../components/ui/rainbow-button';
+import { WarpBackground } from '../components/ui/warp-background';
+import { ShineBorder } from '../components/ui/shine-border';
+import MouseEffectCard from '../components/kokonutui/mouse-effect-card';
+import { LiquidGlassCard } from '../components/kokonutui/liquid-glass-card';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -150,38 +154,40 @@ export default function Dashboard() {
       <PageContainer>
         <div className="space-y-8 pb-16 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative pt-4">
 
-          {/* ── Hero Header ── */}
+          {/* ── Premium Hero Header ── */}
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/50"
+            className="relative w-full rounded-2xl overflow-hidden mb-8 border border-border/40 shadow-2xl"
           >
-            <div className="max-w-[70%]">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-border bg-secondary text-muted-foreground text-[10px] font-bold mb-4 tracking-widest uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                Workspace Overview
+            <WarpBackground perspective={120} beamSize={6} gridColor="var(--border)" className="w-full h-full p-8 md:p-12 lg:p-16 rounded-2xl bg-card border-none flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div className="max-w-[70%] relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/80 backdrop-blur-sm text-foreground text-[10px] font-bold mb-6 tracking-widest uppercase shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_var(--accent)]" />
+                  Command Center Active
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-tight mb-3">
+                  {greeting()}, <br className="hidden md:block" /><span className="bg-gradient-to-r from-accent via-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-sm">{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>
+                </h1>
+                <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-xl font-medium">
+                  Monitor your ideas, active projects, and network growth with real-time insights and premium metrics.
+                </p>
               </div>
               
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground leading-tight mb-2">
-                {greeting()}, <span className="text-foreground">{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1 max-w-xl">
-                Monitor your ideas, active projects, and network growth from your command center.
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3 shrink-0">
-              <Button onClick={() => navigate('/discover?tab=ideas')} variant="outline" className="h-10 px-4 text-xs gap-2 rounded-lg bg-card border-border shadow-sm">
-                <Plus size={14} /> New Concept
-              </Button>
-              <Button onClick={() => navigate('/discover')} className="h-10 px-5 text-xs bg-foreground text-background shadow-sm hover:bg-foreground/90 rounded-lg">
-                Explore Network
-              </Button>
-            </div>
+              <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
+                <RainbowButton onClick={() => navigate('/discover?tab=ideas')} className="h-11 px-6 text-sm gap-2 rounded-xl">
+                  <Plus size={16} /> New Concept
+                </RainbowButton>
+                <Button onClick={() => navigate('/discover')} variant="outline" className="h-11 px-6 text-sm bg-background/50 backdrop-blur-md border-border shadow-lg hover:bg-background/80 rounded-xl transition-all">
+                  Explore Network
+                </Button>
+              </div>
+            </WarpBackground>
           </motion.div>
 
-          {/* ── Stat Cards with Sparklines ── */}
+          {/* ── Premium Bento Stats ── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {STAT_CARDS.map((s, i) => (
               <motion.div 
@@ -190,38 +196,46 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 onClick={() => navigate(s.key === 'connections' ? '/network' : `/discover?tab=${s.key}`)} 
-                className="cursor-pointer group relative overflow-hidden h-full bg-card rounded-xl p-6 border border-border hover:border-foreground/20 transition-all flex flex-col justify-between"
+                className="cursor-pointer h-full transition-all group"
               >
-                <div className="flex items-center justify-between w-full mb-6 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-background border border-border/50 shadow-sm group-hover:scale-105 transition-transform", s.color)}>
-                      <s.icon size={18} strokeWidth={2} />
+                <div className="relative h-full w-full rounded-2xl overflow-hidden p-[1px] bg-gradient-to-b from-border/50 to-transparent group-hover:from-accent/50 transition-colors duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-card to-background rounded-2xl z-0"></div>
+                  <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} borderWidth={1} duration={10} className="rounded-2xl" />
+                  
+                  <div className="relative z-10 p-6 flex flex-col justify-between h-full bg-card/40 backdrop-blur-sm rounded-2xl">
+                    <div className="flex items-center justify-between w-full mb-8">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center bg-background border border-border/50 shadow-inner group-hover:scale-110 transition-transform duration-300", s.color)}>
+                          <s.icon size={20} strokeWidth={2.5} />
+                        </div>
+                        <p className="text-[11px] font-black text-muted-foreground tracking-widest uppercase">
+                          {s.label}
+                        </p>
+                      </div>
+                      <div className="p-2 rounded-full bg-secondary/50 backdrop-blur-md">
+                        <TrendingUp size={16} className={cn("opacity-80 group-hover:opacity-100 transition-opacity", s.color)} />
+                      </div>
                     </div>
-                    <p className="text-xs font-bold text-muted-foreground tracking-wider uppercase">
-                      {s.label}
-                    </p>
-                  </div>
-                  <TrendingUp size={16} className={cn("opacity-50", s.color)} />
-                </div>
 
-                <div className="relative z-10">
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-4xl font-black tracking-tight text-foreground tabular-nums">
-                      {loading ? (
-                        <span className="inline-block w-16 h-10 bg-secondary rounded-md animate-pulse" />
-                      ) : (
-                        <AnimatedNumber value={stats[s.key]} />
-                      )}
-                    </p>
-                  </div>
-                  <p className="text-[11px] font-semibold text-muted-foreground mt-2 bg-secondary inline-block px-2 py-1 rounded-md">
-                    {s.trend}
-                  </p>
-                </div>
+                    <div>
+                      <div className="flex items-baseline gap-3">
+                        <p className="text-5xl font-black tracking-tighter text-foreground tabular-nums drop-shadow-sm">
+                          {loading ? (
+                            <span className="inline-block w-20 h-12 bg-secondary/80 rounded-lg animate-pulse" />
+                          ) : (
+                            <AnimatedNumber value={stats[s.key]} />
+                          )}
+                        </p>
+                      </div>
+                      <p className="text-xs font-bold text-muted-foreground mt-3 bg-secondary/50 backdrop-blur-md inline-block px-2.5 py-1.5 rounded-lg border border-border/50 shadow-sm">
+                        {s.trend}
+                      </p>
+                    </div>
 
-                {/* Background Sparkline */}
-                <div className="absolute bottom-0 left-0 right-0 pointer-events-none translate-y-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                  <Sparkline colorClass={s.color} />
+                    <div className="absolute bottom-0 left-0 right-0 pointer-events-none translate-y-4 opacity-30 group-hover:opacity-60 group-hover:translate-y-2 transition-all duration-500">
+                      <Sparkline colorClass={s.color} />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -237,110 +251,99 @@ export default function Dashboard() {
               transition={{ delay: 0.25 }}
               className="lg:col-span-2 space-y-6"
             >
-              {/* Mentor Requests Table */}
+              {/* Mentor Requests List */}
               {profile?.role === 'mentor' && pendingIdeas.length > 0 && (
-                <div className="rounded-xl border border-emerald-500/20 bg-card overflow-hidden">
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/10 bg-emerald-500/5">
+                <LiquidGlassCard className="mb-6 p-6 border-emerald-500/30">
+                  <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-sm font-bold text-emerald-500 flex items-center gap-2">
-                        <Sparkles size={16} /> Action Required: Mentor Review
+                      <h2 className="text-lg font-black text-emerald-500 flex items-center gap-2 drop-shadow-sm">
+                        <Sparkles size={20} /> Action Required: Mentor Review
                       </h2>
                     </div>
                   </div>
-                  <div className="divide-y divide-emerald-500/10">
+                  <div className="grid grid-cols-1 gap-4">
                     {pendingIdeas.map((idea) => (
-                      <div key={idea.id} className="p-4 hover:bg-emerald-500/5 transition-colors flex items-center justify-between">
-                        <div className="flex-1 min-w-0 pr-4">
-                          <h3 className="font-bold text-sm text-foreground truncate">{idea.title}</h3>
-                          <p className="text-xs text-muted-foreground truncate mt-1">Requested by {idea.authorName}</p>
+                      <div key={idea.id} className="p-4 rounded-xl bg-card/60 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm group">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-base text-foreground truncate group-hover:text-emerald-400 transition-colors">{idea.title}</h3>
+                          <p className="text-xs font-semibold text-muted-foreground truncate mt-1">Requested by <span className="text-foreground">{idea.authorName}</span></p>
                         </div>
-                        <div className="flex gap-2 shrink-0">
-                          <Button size="sm" variant="outline" className="h-8 text-xs border-red-500/30 text-red-500 hover:bg-red-500/10">
+                        <div className="flex gap-2 shrink-0 w-full sm:w-auto">
+                          <Button size="sm" variant="outline" className="flex-1 sm:flex-none h-9 text-xs border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500 rounded-lg">
                             Decline
                           </Button>
-                          <Button size="sm" className="h-8 text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-none">
+                          <Button size="sm" className="flex-1 sm:flex-none h-9 text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-md rounded-lg">
                             Approve
                           </Button>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </LiquidGlassCard>
               )}
 
-              {/* Recent Ideas Data Table */}
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                  <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <FileText size={16} className="text-muted-foreground" /> Recent Ideas
+              {/* Premium Recent Ideas List */}
+              <LiquidGlassCard className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <FileText size={20} className="text-accent" /> Recent Ideas
                   </h2>
-                  <button onClick={() => navigate(`/profile/${profile?.id}`)} className="text-[11px] font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors inline-flex items-center gap-1">
+                  <button onClick={() => navigate(`/profile/${profile?.id}`)} className="text-[11px] font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors inline-flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-secondary">
                     View All <ArrowRight size={12} />
                   </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-[10px] text-muted-foreground uppercase bg-secondary/50 border-b border-border tracking-widest">
-                      <tr>
-                        <th className="px-6 py-3 font-semibold">Project Name</th>
-                        <th className="px-6 py-3 font-semibold">Status</th>
-                        <th className="px-6 py-3 font-semibold">Date</th>
-                        <th className="px-6 py-3 font-semibold text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {loading ? (
-                        Array(4).fill(0).map((_, i) => (
-                          <tr key={i} className="animate-pulse">
-                            <td className="px-6 py-4"><div className="h-4 w-32 bg-secondary rounded" /></td>
-                            <td className="px-6 py-4"><div className="h-4 w-16 bg-secondary rounded" /></td>
-                            <td className="px-6 py-4"><div className="h-4 w-20 bg-secondary rounded" /></td>
-                            <td className="px-6 py-4 text-right"><div className="h-4 w-8 bg-secondary rounded ml-auto" /></td>
-                          </tr>
-                        ))
-                      ) : recentIdeas.length > 0 ? (
-                        recentIdeas.map((idea) => (
-                          <tr key={idea.id} className="hover:bg-secondary/50 transition-colors group">
-                            <td className="px-6 py-4">
-                              <p className="font-bold text-foreground text-sm truncate max-w-[200px]">{idea.title}</p>
-                              <p className="text-xs text-muted-foreground truncate max-w-[200px] mt-0.5">{idea.description}</p>
-                            </td>
-                            <td className="px-6 py-4">
-                              {idea.certified ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">
-                                  <Sparkles size={10} /> Certified
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-secondary text-muted-foreground text-[10px] font-bold border border-border">
-                                  Pending
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-xs text-muted-foreground font-medium">
-                              {new Date(idea.createdAt?.seconds ? idea.createdAt.seconds * 1000 : idea.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <button onClick={() => navigate('/discover')} className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors inline-block">
-                                <ChevronRight size={16} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
-                            <div className="flex flex-col items-center gap-2">
-                              <Lightbulb size={24} className="opacity-20" />
-                              <p className="text-sm">No ideas yet. Start building!</p>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                <div className="grid grid-cols-1 gap-4">
+                  {loading ? (
+                    Array(3).fill(0).map((_, i) => (
+                      <div key={i} className="animate-pulse p-4 rounded-xl bg-card border border-border flex items-center justify-between">
+                        <div className="space-y-2">
+                          <div className="h-4 w-32 bg-secondary rounded" />
+                          <div className="h-3 w-48 bg-secondary rounded" />
+                        </div>
+                        <div className="h-6 w-16 bg-secondary rounded-full" />
+                      </div>
+                    ))
+                  ) : recentIdeas.length > 0 ? (
+                    recentIdeas.map((idea) => (
+                      <div key={idea.id} className="p-4 rounded-xl bg-card/40 border border-border/60 hover:border-accent/50 hover:bg-accent/5 transition-all group flex items-center justify-between cursor-pointer" onClick={() => navigate('/discover')}>
+                        <div className="flex-1 min-w-0 pr-4">
+                          <p className="font-bold text-foreground text-sm truncate group-hover:text-accent transition-colors">{idea.title}</p>
+                          <p className="text-xs text-muted-foreground truncate mt-1">{idea.description}</p>
+                        </div>
+                        <div className="flex items-center gap-4 shrink-0">
+                          {idea.certified ? (
+                            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black border border-emerald-500/20 shadow-sm">
+                              <Sparkles size={10} /> CERTIFIED
+                            </span>
+                          ) : (
+                            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-muted-foreground text-[10px] font-bold border border-border">
+                              PENDING
+                            </span>
+                          )}
+                          <div className="text-xs text-muted-foreground font-medium hidden md:block">
+                            {new Date(idea.createdAt?.seconds ? idea.createdAt.seconds * 1000 : idea.createdAt).toLocaleDateString()}
+                          </div>
+                          <button className="p-2 rounded-lg text-muted-foreground group-hover:text-accent group-hover:bg-accent/10 transition-colors">
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-12 text-center flex flex-col items-center justify-center rounded-xl bg-secondary/30 border border-dashed border-border">
+                      <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+                        <Lightbulb size={32} className="text-muted-foreground/50" />
+                      </div>
+                      <p className="text-base font-bold text-foreground">No ideas yet.</p>
+                      <p className="text-sm text-muted-foreground mt-1 mb-4">Your next big thing starts here.</p>
+                      <RainbowButton onClick={() => navigate('/discover?tab=ideas')} className="h-9 px-4 text-xs">
+                        Start Building
+                      </RainbowButton>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </LiquidGlassCard>
             </motion.div>
 
             {/* Right Col: Activity & Actions */}
@@ -376,33 +379,31 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Activity Feed (Mocked for premium feel) */}
-              <div className="rounded-xl border border-border bg-card p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
-                  <Activity size={14} /> Activity Feed
-                </p>
-                <div className="space-y-5 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-border before:to-transparent">
-                  
+              {/* Premium Activity Feed */}
+              <LiquidGlassCard className="p-6 border-border/40 bg-card/60">
+                <h2 className="text-lg font-black text-foreground flex items-center gap-2 mb-6">
+                  <Activity size={20} className="text-blue-500" /> Activity Feed
+                </h2>
+                <div className="space-y-4">
                   {activities.length > 0 ? (
                     activities.map((activity, idx) => (
-                      <div key={`${activity.id}-${idx}`} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div className={cn("flex items-center justify-center w-6 h-6 rounded-full border-2 border-background shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10", activity.color)}>
-                          <activity.icon size={10} strokeWidth={3} />
+                      <div key={`${activity.id}-${idx}`} className="p-4 flex flex-col sm:flex-row sm:items-center gap-4 bg-secondary/30 hover:bg-secondary/50 transition-colors rounded-xl border border-border/30">
+                        <div className={cn("flex items-center justify-center w-10 h-10 rounded-xl shrink-0 shadow-inner", activity.color)}>
+                          <activity.icon size={18} strokeWidth={2.5} />
                         </div>
-                        <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-xl border border-border bg-secondary/50 ml-4 md:ml-0 hover:bg-secondary transition-colors">
-                          <p className="text-xs font-semibold text-foreground">{activity.title}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{activity.description}</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-bold text-foreground truncate">{activity.title}</div>
+                          <div className="text-[11px] font-medium text-muted-foreground mt-0.5 truncate">{activity.description}</div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-6">
-                      <p className="text-xs text-muted-foreground">No recent activity.</p>
+                    <div className="text-center py-8 bg-secondary/30 rounded-xl border border-dashed border-border">
+                      <div className="text-sm font-semibold text-muted-foreground">No recent activity.</div>
                     </div>
                   )}
-
                 </div>
-              </div>
+              </LiquidGlassCard>
 
             </motion.div>
           </div>

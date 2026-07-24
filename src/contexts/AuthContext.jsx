@@ -32,18 +32,23 @@ export const AuthProvider = ({ children }) => {
  }, []);
 
  useEffect(() => {
- // Subscribe to auth state changes
- const unsubscribe = authService.onAuthStateChange(async (firebaseUser) => {
- setUser(firebaseUser);
- 
- if (firebaseUser) {
- await fetchProfile(firebaseUser.uid);
- userService.updatePresence(firebaseUser.uid, 'online');
- } else {
- setProfile(null);
- setLoading(false);
- }
- });
+  // Check for redirect result from OAuth
+  authService.checkRedirectResult().then(({ error }) => {
+    if (error) toast.error(error);
+  });
+
+  // Subscribe to auth state changes
+  const unsubscribe = authService.onAuthStateChange(async (firebaseUser) => {
+  setUser(firebaseUser);
+  
+  if (firebaseUser) {
+  await fetchProfile(firebaseUser.uid);
+  userService.updatePresence(firebaseUser.uid, 'online');
+  } else {
+  setProfile(null);
+  setLoading(false);
+  }
+  });
 
  const handleFocus = () => {
  const currentUser = authService.getCurrentUser();

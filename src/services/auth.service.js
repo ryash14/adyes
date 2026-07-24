@@ -6,7 +6,8 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   GithubAuthProvider,
   signOut as firebaseSignOut,
@@ -58,13 +59,28 @@ class AuthService {
   }
 
   /**
-   * Sign in with Google (popup-based — no page reload)
+   * Check redirect result after OAuth redirect
+   */
+  async checkRedirectResult() {
+    try {
+      const result = await getRedirectResult(auth);
+      if (result) {
+        return await this.handleOAuthResult(result);
+      }
+      return { user: null, error: null };
+    } catch (error) {
+      console.error('Redirect result error:', error);
+      return { user: null, error: this.handleAuthError(error) };
+    }
+  }
+
+  /**
+   * Sign in with Google (redirect-based)
    */
   async signInWithGoogle() {
     try {
-      const result = await signInWithPopup(auth, this.googleProvider);
-      const oauthResult = await this.handleOAuthResult(result);
-      return oauthResult;
+      await signInWithRedirect(auth, this.googleProvider);
+      return { user: null, error: null };
     } catch (error) {
       console.error('Google sign in error:', error);
       
@@ -74,22 +90,18 @@ class AuthService {
           error: 'Google Sign-In is not configured. Please enable it in Firebase Console under Authentication > Sign-in method > Google.' 
         };
       }
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-        return { user: null, error: null }; // User cancelled — not an error
-      }
       
       return { user: null, error: this.handleAuthError(error) };
     }
   }
 
   /**
-   * Sign in with GitHub (popup-based — no page reload)
+   * Sign in with GitHub (redirect-based)
    */
   async signInWithGithub() {
     try {
-      const result = await signInWithPopup(auth, this.githubProvider);
-      const oauthResult = await this.handleOAuthResult(result);
-      return oauthResult;
+      await signInWithRedirect(auth, this.githubProvider);
+      return { user: null, error: null };
     } catch (error) {
       console.error('GitHub sign in error:', error);
       
@@ -98,9 +110,6 @@ class AuthService {
           user: null,
           error: 'An account already exists with the same email address but different sign-in credentials. Sign in using a provider associated with this email address.'
         };
-      }
-      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-        return { user: null, error: null }; // User cancelled — not an error
       }
       
       return { user: null, error: this.handleAuthError(error) };

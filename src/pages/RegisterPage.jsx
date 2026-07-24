@@ -100,7 +100,7 @@ export default function RegisterPage() {
         type="button"
         onClick={() => handleProviderSignIn(signInWithGoogle, 'google')}
         disabled={providerLoading !== null}
-        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-zinc-800 bg-transparent text-white transition-all duration-200 hover:bg-zinc-800/50 hover:border-zinc-700 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-border bg-transparent text-foreground transition-all duration-200 hover:bg-secondary hover:border-border disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
       >
         {providerLoading === 'google' ? (
           <Loader2 size={18} className="animate-spin text-zinc-400" />
@@ -115,7 +115,7 @@ export default function RegisterPage() {
         type="button"
         onClick={() => handleProviderSignIn(signInWithGithub, 'github')}
         disabled={providerLoading !== null}
-        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-zinc-800 bg-transparent text-white transition-all duration-200 hover:bg-zinc-800/50 hover:border-zinc-700 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+        className="group relative flex items-center justify-center h-11 w-full rounded-full border border-border bg-transparent text-foreground transition-all duration-200 hover:bg-secondary hover:border-border disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
       >
         {providerLoading === 'github' ? (
           <Loader2 size={18} className="animate-spin text-zinc-400" />
@@ -129,7 +129,7 @@ export default function RegisterPage() {
     </div>
 
     <div className="relative flex py-2 items-center justify-center mb-4">
-      <div className="absolute inset-x-0 top-1/2 border-t border-[#222222] -z-10" />
+      <div className="absolute inset-x-0 top-1/2 border-t border-border -z-10" />
       <span className="bg-background px-4 relative z-10 text-[13px] text-muted-foreground">
         or
       </span>
@@ -149,7 +149,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4"
+          className="h-11 bg-secondary border-transparent text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring rounded-xl text-[14px] px-4"
         />
       </label>
 
@@ -160,12 +160,12 @@ export default function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="h-11 bg-[#1c1c1c] border-transparent text-white placeholder:text-[#666666] focus-visible:ring-1 focus-visible:ring-white rounded-xl text-[14px] px-4 pr-10"
+          className="h-11 bg-secondary border-transparent text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring rounded-xl text-[14px] px-4 pr-10"
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] hover:text-white transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
         >
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
@@ -173,7 +173,7 @@ export default function RegisterPage() {
 
       <button
         type="submit"
-        className="w-full mt-2 h-11 bg-white text-black font-semibold text-[14px] rounded-full hover:bg-zinc-200 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
+        className="w-full mt-2 h-11 bg-primary text-primary-foreground font-semibold text-[14px] rounded-full hover:bg-primary/90 transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
         disabled={loading}
       >
         {loading ? (
@@ -183,8 +183,8 @@ export default function RegisterPage() {
         ) : 'Continue'}
       </button>
 
-      <p className="text-[11px] text-[#888888] text-center mt-4">
-        By continuing, you agree to adyes's <span className="underline cursor-pointer hover:text-white">Terms</span> and <span className="underline cursor-pointer hover:text-white">Privacy</span>.
+      <p className="text-[11px] text-muted-foreground text-center mt-4">
+        By continuing, you agree to adyes's <span className="underline cursor-pointer hover:text-foreground">Terms</span> and <span className="underline cursor-pointer hover:text-foreground">Privacy</span>.
       </p>
     </motion.form>
   </AuthLayout>
