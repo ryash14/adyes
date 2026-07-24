@@ -163,11 +163,6 @@ export default function Dashboard() {
           >
             <div className="w-full p-8 md:p-12 lg:p-16 rounded-2xl bg-card flex flex-col md:flex-row md:items-end justify-between gap-8 border border-border/40 shadow-sm">
               <div className="max-w-[70%] relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary text-foreground text-[10px] font-bold mb-6 tracking-widest uppercase">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                  Command Center Active
-                </div>
-                
                 <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-tight mb-3">
                   {greeting()}, <br className="hidden md:block" /><span>{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>
                 </h1>
@@ -385,9 +380,12 @@ export default function Dashboard() {
                         <div className={cn("flex items-center justify-center w-10 h-10 rounded-xl shrink-0 shadow-inner", activity.color)}>
                           <activity.icon size={18} strokeWidth={2.5} />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pr-4">
                           <div className="text-sm font-bold text-foreground truncate">{activity.title}</div>
-                          <div className="text-[11px] font-medium text-muted-foreground mt-0.5 truncate">{activity.description}</div>
+                          <div className="text-[12px] font-medium text-muted-foreground mt-0.5 truncate">{activity.description}</div>
+                        </div>
+                        <div className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground shrink-0 mt-1 sm:mt-0">
+                          {new Date(activity.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </div>
                       </div>
                     ))
