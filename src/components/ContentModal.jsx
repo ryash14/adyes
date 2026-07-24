@@ -155,22 +155,22 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  title={`${isEdit ? 'Edit' : 'New'} ${type === 'idea' ? 'Idea' : 'Project'}`}
  footer={footer}
  >
- <form onSubmit={handleSubmit} className="space-y-5">
- <label className="block space-y-1.5">
- <span className="text-sm font-semibold">Title</span>
+ <form onSubmit={handleSubmit} className="space-y-6">
+ <label className="block space-y-2">
+ <span className="text-sm font-bold text-foreground">Title</span>
  <input
  type="text"
- className="input h-10 w-full"
+ className="w-full h-12 bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent transition-all"
  value={formData.title}
  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
  placeholder={`A brilliant new ${type}...`}
  />
  </label>
  
- <label className="block space-y-1.5">
- <span className="text-sm font-semibold">Description</span>
+ <label className="block space-y-2">
+ <span className="text-sm font-bold text-foreground">Description</span>
  <textarea
- className="input min-h-[120px] w-full py-2 resize-y"
+ className="w-full min-h-[140px] bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent transition-all resize-y"
  value={formData.description}
  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
  placeholder={`Describe your ${type}...`}
@@ -219,11 +219,11 @@ export default function ContentModal({ open, onClose, type, item, userId, author
  )}
 
   {type === 'idea' && (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-semibold">Tags (comma separated)</span>
+    <label className="block space-y-2">
+      <span className="text-sm font-bold text-foreground">Tags (comma separated)</span>
       <input
         type="text"
-        className="input h-10 w-full"
+        className="w-full h-12 bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent transition-all"
         value={formData.tags}
         onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
         placeholder="React, Next.js, AI"
@@ -246,11 +246,12 @@ export default function ContentModal({ open, onClose, type, item, userId, author
       </label>
 
       {needMentor && (
-        <div className="space-y-4 p-4 bg-white/5 rounded-xl border border-white/10">
-          <label className="block space-y-1.5">
-            <span className="text-xs font-semibold text-zinc-300">Select a Mentor</span>
+        <div className="space-y-5 p-6 bg-secondary/20 rounded-2xl border border-border/50 mt-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
+          <label className="block space-y-2 relative z-10">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Select a Mentor</span>
             <select
-              className="input h-10 w-full bg-black/40"
+              className="w-full h-12 bg-secondary border border-border text-foreground rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent transition-all cursor-pointer appearance-none font-medium"
               value={mentorId}
               onChange={(e) => setMentorId(e.target.value)}
             >
@@ -261,16 +262,16 @@ export default function ContentModal({ open, onClose, type, item, userId, author
             </select>
           </label>
 
-          <label className="block space-y-1.5">
-            <span className="text-xs font-semibold text-zinc-300">Personalized Note</span>
+          <label className="block space-y-2">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Personalized Note</span>
             <textarea
-              className="input min-h-[80px] w-full py-2 resize-y bg-black/40 text-sm"
+              className="w-full min-h-[100px] bg-secondary border border-border text-foreground placeholder:text-muted-foreground rounded-xl px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent transition-all resize-y text-sm font-medium"
               placeholder="Hi, I'd love your guidance on this idea..."
               value={mentorNote}
               onChange={(e) => setMentorNote(e.target.value)}
             />
           </label>
-          <p className="text-[11px] text-zinc-500 leading-tight">
+          <p className="text-[11px] text-muted-foreground leading-relaxed relative z-10">
             If you request a mentor, your idea will not be published publicly until the mentor reviews and accepts it.
           </p>
         </div>
