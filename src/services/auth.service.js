@@ -6,6 +6,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
@@ -75,12 +76,12 @@ class AuthService {
   }
 
   /**
-   * Sign in with Google (redirect-based)
+   * Sign in with Google (popup-based)
    */
   async signInWithGoogle() {
     try {
-      await signInWithRedirect(auth, this.googleProvider);
-      return { user: null, error: null };
+      const result = await signInWithPopup(auth, this.googleProvider);
+      return await this.handleOAuthResult(result);
     } catch (error) {
       console.error('Google sign in error:', error);
       
@@ -96,12 +97,12 @@ class AuthService {
   }
 
   /**
-   * Sign in with GitHub (redirect-based)
+   * Sign in with GitHub (popup-based)
    */
   async signInWithGithub() {
     try {
-      await signInWithRedirect(auth, this.githubProvider);
-      return { user: null, error: null };
+      const result = await signInWithPopup(auth, this.githubProvider);
+      return await this.handleOAuthResult(result);
     } catch (error) {
       console.error('GitHub sign in error:', error);
       
