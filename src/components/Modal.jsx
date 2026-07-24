@@ -20,12 +20,14 @@ export default function Modal({ open, isOpen, onClose, title, children, footer, 
   return (
     <AnimatePresence>
       {visible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            type="button"
+        <motion.div 
+          key="modal-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div
             className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             onClick={onClose}
             aria-label="Close modal"
@@ -73,7 +75,7 @@ export default function Modal({ open, isOpen, onClose, title, children, footer, 
               </div>
             )}
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
