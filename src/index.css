@@ -188,17 +188,18 @@
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    @apply bg-background border-l border-border;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-300 dark:bg-zinc-800 rounded-full;
+    @apply bg-border rounded-full hover:bg-accent transition-colors;
+    border: 2px solid var(--background);
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-400 dark:bg-zinc-700;
+    @apply bg-accent;
   }
 }
 

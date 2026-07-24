@@ -161,15 +161,15 @@ export default function Dashboard() {
             transition={{ duration: 0.4 }}
             className="relative w-full rounded-2xl overflow-hidden mb-8 border border-border/40 shadow-2xl"
           >
-            <WarpBackground perspective={120} beamSize={6} gridColor="var(--border)" className="w-full h-full p-8 md:p-12 lg:p-16 rounded-2xl bg-card border-none flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="w-full p-8 md:p-12 lg:p-16 rounded-2xl bg-card flex flex-col md:flex-row md:items-end justify-between gap-8 border border-border/40 shadow-sm">
               <div className="max-w-[70%] relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/80 backdrop-blur-sm text-foreground text-[10px] font-bold mb-6 tracking-widest uppercase shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_var(--accent)]" />
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary text-foreground text-[10px] font-bold mb-6 tracking-widest uppercase">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   Command Center Active
                 </div>
                 
                 <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-tight mb-3">
-                  {greeting()}, <br className="hidden md:block" /><span className="bg-gradient-to-r from-accent via-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-sm">{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>
+                  {greeting()}, <br className="hidden md:block" /><span>{profile?.displayName?.split(' ')[0] || 'Explorer'}</span>
                 </h1>
                 <p className="text-muted-foreground text-sm md:text-base mt-2 max-w-xl font-medium">
                   Monitor your ideas, active projects, and network growth with real-time insights and premium metrics.
@@ -177,14 +177,14 @@ export default function Dashboard() {
               </div>
               
               <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
-                <RainbowButton onClick={() => navigate('/discover?tab=ideas')} className="h-11 px-6 text-sm gap-2 rounded-xl">
+                <Button onClick={() => navigate('/discover?tab=ideas')} className="h-11 px-6 text-sm gap-2 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground">
                   <Plus size={16} /> New Concept
-                </RainbowButton>
-                <Button onClick={() => navigate('/discover')} variant="outline" className="h-11 px-6 text-sm bg-background/50 backdrop-blur-md border-border shadow-lg hover:bg-background/80 rounded-xl transition-all">
+                </Button>
+                <Button onClick={() => navigate('/discover')} variant="outline" className="h-11 px-6 text-sm bg-background border-border hover:bg-secondary rounded-xl transition-all">
                   Explore Network
                 </Button>
               </div>
-            </WarpBackground>
+            </div>
           </motion.div>
 
           {/* ── Premium Bento Stats ── */}
@@ -198,21 +198,18 @@ export default function Dashboard() {
                 onClick={() => navigate(s.key === 'connections' ? '/network' : `/discover?tab=${s.key}`)} 
                 className="cursor-pointer h-full transition-all group"
               >
-                <div className="relative h-full w-full rounded-2xl overflow-hidden p-[1px] bg-gradient-to-b from-border/50 to-transparent group-hover:from-accent/50 transition-colors duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-br from-card to-background rounded-2xl z-0"></div>
-                  <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} borderWidth={1} duration={10} className="rounded-2xl" />
-                  
-                  <div className="relative z-10 p-6 flex flex-col justify-between h-full bg-card/40 backdrop-blur-sm rounded-2xl">
+                <div className="relative h-full w-full rounded-2xl overflow-hidden border border-border/50 bg-card hover:bg-accent/5 transition-colors duration-300">
+                  <div className="relative z-10 p-6 flex flex-col justify-between h-full rounded-2xl">
                     <div className="flex items-center justify-between w-full mb-8">
                       <div className="flex items-center gap-3">
-                        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center bg-background border border-border/50 shadow-inner group-hover:scale-110 transition-transform duration-300", s.color)}>
+                        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center bg-secondary border border-border shadow-inner group-hover:scale-105 transition-transform duration-300", s.color)}>
                           <s.icon size={20} strokeWidth={2.5} />
                         </div>
                         <p className="text-[11px] font-black text-muted-foreground tracking-widest uppercase">
                           {s.label}
                         </p>
                       </div>
-                      <div className="p-2 rounded-full bg-secondary/50 backdrop-blur-md">
+                      <div className="p-2 rounded-full bg-secondary">
                         <TrendingUp size={16} className={cn("opacity-80 group-hover:opacity-100 transition-opacity", s.color)} />
                       </div>
                     </div>
@@ -221,20 +218,17 @@ export default function Dashboard() {
                       <div className="flex items-baseline gap-3">
                         <p className="text-5xl font-black tracking-tighter text-foreground tabular-nums drop-shadow-sm">
                           {loading ? (
-                            <span className="inline-block w-20 h-12 bg-secondary/80 rounded-lg animate-pulse" />
+                            <span className="inline-block w-20 h-12 bg-secondary rounded-lg animate-pulse" />
                           ) : (
                             <AnimatedNumber value={stats[s.key]} />
                           )}
                         </p>
                       </div>
-                      <p className="text-xs font-bold text-muted-foreground mt-3 bg-secondary/50 backdrop-blur-md inline-block px-2.5 py-1.5 rounded-lg border border-border/50 shadow-sm">
+                      <p className="text-xs font-bold text-muted-foreground mt-3 bg-secondary inline-block px-2.5 py-1.5 rounded-lg border border-border/50 shadow-sm">
                         {s.trend}
                       </p>
                     </div>
 
-                    <div className="absolute bottom-0 left-0 right-0 pointer-events-none translate-y-4 opacity-30 group-hover:opacity-60 group-hover:translate-y-2 transition-all duration-500">
-                      <Sparkline colorClass={s.color} />
-                    </div>
                   </div>
                 </div>
               </motion.div>
