@@ -1,87 +1,65 @@
-<p align="center">
-  <a href="https://adyes.io">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://placehold.co/1000x500/000000/ffffff/png?text=Adyes" />
-      <source media="(prefers-color-scheme: light)" srcset="https://placehold.co/1000x500/F7F5F2/FF6363/png?text=Adyes" />
-      <img src="https://placehold.co/1000x500/000000/ffffff/png?text=Adyes" alt="Adyes banner" />
-    </picture>
-  </a>
-</p>
+# Adyes
 
-<h2 align="center">The #1 Open-Source Platform for Ambitious Builders</h2>
+> `A collaboration application with local embedding search over ideas and projects.`
 
-<p align="center">
-  <a href="https://adyes.io">Website</a> · 
-  <a href="https://docs.adyes.io">Documentation</a> · 
-  <a href="https://github.com/orgs/adyes/projects/1">Roadmap</a> · 
-  <a href="https://discord.gg/adyes">Discord</a>
-</p>
+### 🏗️ System Architecture
 
-<br />
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+flowchart TD
+    N0["React idea and project interface"]
+    N1["Firebase content services"]
+    N2["Flask semantic search API"]
+    N3["Local FastEmbed encoder"]
+    N4["FAISS idea and project indexes"]
+    N5["Ranked results"]
+    N6["React search experience"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+```
 
-# Why Adyes?
+### 🛠️ Production Stack
 
-Adyes gives founders, engineers, and designers the building blocks to go from a raw concept to a fully functioning startup ecosystem. Instead of building in isolation, Adyes is a centralized platform tailored to validate your ideas through expert mentorship, match with co-founders, and track active project development.
+React · Vite · Firebase · Flask · FastEmbed · FAISS · NumPy
 
-Adyes brings a distinct, premium point of view to platform design, leveraging cinematic motion, deep True Black themes, and a Warm Neutral light aesthetic designed to keep builders engaged and inspired.
+### ⚡ Key Engineering Capabilities
 
-<br />
+- Separate idea and project indexes support semantic discovery.
+- FastEmbed generates local embeddings for FAISS search.
+- Firebase services separate authentication, content, messaging and search concerns.
 
-# Tech Stack & Philosophy
+### 🚀 Deployment and Local Setup
 
-Adyes is built on a modern, ultra-premium web stack focusing on top-tier developer experience and stunning visual aesthetics:
-
-- **React 18** + **Vite** for blazing fast frontend tooling.
-- **Tailwind CSS v4** for next-generation utility-first styling and theme token management.
-- **Framer Motion v12** for fluid, hardware-accelerated micro-interactions and cinematic entry animations.
-- **KokonutUI & Shadcn UI** for highly polished, accessible, and interactive component architectures.
-- **Firebase** (Auth, Firestore, Storage) for robust, scalable backend infrastructure.
-
-<br />
-
-# Installation
-
-### Local Development
-
-Scaffold the environment locally to contribute or self-host:
+Run from the repository root after cloning:
 
 ```bash
-git clone https://github.com/adyes-org/adyes.git
+git clone https://github.com/ryash14/adyes.git
 cd adyes
 npm install
-```
-
-Configure your environment variables for Firebase:
-
-```bash
-cp .env.example .env.local
-```
-
-Then start the development server:
-
-```bash
+npm run build
+# Start the frontend for local development:
 npm run dev
+# In a second terminal with a Python virtual environment:
+# pip install -r "semantic search/requirements.txt"
+# npm run search
 ```
 
-<br />
+Configure Firebase for the client and server, including `FIREBASE_ADMIN_CREDENTIALS` or a private local credential file for the search service. The search service can enter a demo mode when Firebase is unavailable. Embedding weights download on first setup. Build output alone does not deploy Firebase or the Flask service; configure the search URL in the client service.
 
-# Features
+### Verification
 
-### 🧠 Expert Mentorship
-Get your early-stage concepts validated and certified by industry-leading mentors. Turn raw ideas into validated blueprints.
+```bash
+npm run lint
+```
 
-### 👥 Builder Network
-Find your perfect co-founder. Filter through a network of verified builders, engineers, and designers ready to join your active projects.
+These commands are provided by the source configuration; this documentation update does not claim a fresh end-to-end application run.
 
-### 🚀 Active Projects
-Transform certified ideas into public projects. Track milestones, recruit team members, and showcase your development progress.
+### Source Map
 
-<br />
-
-# Join the Community
-
-<p>
-  <a href="https://github.com/adyes-org/adyes">Star the repo</a> · 
-  <a href="https://discord.gg/adyes">Discord</a> · 
-  <a href="https://twitter.com/adyeshq">X / Twitter</a>
-</p>
+- [semantic search/app.py](semantic%20search/app.py)
+- [src/services/semanticSearch.js](src/services/semanticSearch.js)
+- [src/services/content.service.js](src/services/content.service.js)
