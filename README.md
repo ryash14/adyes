@@ -4,7 +4,15 @@ Adyes is a collaboration application with semantic discovery over ideas and proj
 
 Keyword matching is often too narrow for early-stage project discovery: people describe similar ideas in different terms. Adyes combines the React collaboration experience with a Python search service that embeds content locally and searches dedicated idea and project indexes.
 
-[Quick start](#quick-start) · [How it works](#how-it-works) · [Development](#development) · [Contributing](CONTRIBUTING.md)
+[Quick start](#quick-start) · [Architecture](#architecture-and-request-flow) · [Development](#development) · [Contributing](CONTRIBUTING.md)
+
+## Capabilities
+
+| Workflow | Result |
+|---|---|
+| Publish content | Use Firebase-backed collaboration and content services. |
+| Discover related work | Search ideas and projects using local FastEmbed vectors. |
+| Inspect matches | Return ranked results from the appropriate FAISS index. |
 
 ## Quick start
 
@@ -26,14 +34,14 @@ npm run dev
 
 Configure Firebase for the client and server, including `FIREBASE_ADMIN_CREDENTIALS` or a private local credential file for the search service. The search service can enter a demo mode when Firebase is unavailable. Embedding weights download on first setup. Build output alone does not deploy Firebase or the Flask service; configure the search URL in the client service.
 
-## How it works
+## Architecture and request flow
 
 1. Users create or browse content through the React interface and Firebase-backed services.
 2. The search service loads content, generates FastEmbed vectors and maintains FAISS indexes.
 3. Search requests are embedded with the same encoder and matched against the appropriate content index.
 4. The client presents the ranked projects or ideas.
 
-### Component boundaries
+### Component model
 
 ```mermaid
 flowchart TB
@@ -51,7 +59,7 @@ flowchart TB
     Results --> Browser
 ```
 
-### Design decisions
+### Engineering decisions
 
 The browser, Firebase services and Flask search process are separate deployment units. Client services isolate authentication, content, messages and discovery. The search service uses ONNX-backed FastEmbed and persisted FAISS artifacts.
 
