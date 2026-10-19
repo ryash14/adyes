@@ -1,40 +1,16 @@
 # Adyes
 
-> `A collaboration application with local embedding search over ideas and projects.`
+Adyes is a collaboration application with semantic discovery over ideas and projects.
 
-### 🏗️ System Architecture
+Keyword matching is often too narrow for early-stage project discovery: people describe similar ideas in different terms. Adyes combines the React collaboration experience with a Python search service that embeds content locally and searches dedicated idea and project indexes.
 
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-flowchart TD
-    N0["React idea and project interface"]
-    N1["Firebase content services"]
-    N2["Flask semantic search API"]
-    N3["Local FastEmbed encoder"]
-    N4["FAISS idea and project indexes"]
-    N5["Ranked results"]
-    N6["React search experience"]
-    N0 --> N1
-    N1 --> N2
-    N2 --> N3
-    N3 --> N4
-    N4 --> N5
-    N5 --> N6
-```
+[Quick start](#quick-start) · [How it works](#how-it-works) · [Development](#development) · [Contributing](CONTRIBUTING.md)
 
-### 🛠️ Production Stack
+## Quick start
 
-React · Vite · Firebase · Flask · FastEmbed · FAISS · NumPy
+Use the Node.js version required by the checked-in Vite dependency. The search service needs Python, its own requirements and Firebase administrative access. Embedding model setup requires an initial download.
 
-### ⚡ Key Engineering Capabilities
-
-- Separate idea and project indexes support semantic discovery.
-- FastEmbed generates local embeddings for FAISS search.
-- Firebase services separate authentication, content, messaging and search concerns.
-
-### 🚀 Deployment and Local Setup
-
-Run from the repository root after cloning:
+From a fresh checkout:
 
 ```bash
 git clone https://github.com/ryash14/adyes.git
@@ -50,16 +26,59 @@ npm run dev
 
 Configure Firebase for the client and server, including `FIREBASE_ADMIN_CREDENTIALS` or a private local credential file for the search service. The search service can enter a demo mode when Firebase is unavailable. Embedding weights download on first setup. Build output alone does not deploy Firebase or the Flask service; configure the search URL in the client service.
 
-### Verification
+## How it works
+
+1. Users create or browse content through the React interface and Firebase-backed services.
+2. The search service loads content, generates FastEmbed vectors and maintains FAISS indexes.
+3. Search requests are embedded with the same encoder and matched against the appropriate content index.
+4. The client presents the ranked projects or ideas.
+
+### Component boundaries
+
+```mermaid
+flowchart TB
+    Browser["React collaboration interface"] --> Client["Content and search services"]
+    Client <--> Firebase["Firebase authentication and content"]
+    Firebase --> Indexer["Content loading and FastEmbed encoding"]
+    Indexer --> Ideas[("FAISS idea index")]
+    Indexer --> Projects[("FAISS project index")]
+    Client --> Search["Flask semantic search"]
+    Search --> Encoder["Query embedding"]
+    Encoder --> Ideas
+    Encoder --> Projects
+    Ideas --> Results["Ranked content results"]
+    Projects --> Results
+    Results --> Browser
+```
+
+### Design decisions
+
+The browser, Firebase services and Flask search process are separate deployment units. Client services isolate authentication, content, messages and discovery. The search service uses ONNX-backed FastEmbed and persisted FAISS artifacts.
+
+The service can fall back to demo behavior when Firebase credentials are unavailable. That path is useful for exploration but must not be confused with a live project index.
+
+## Implementation
+
+**Stack:** React · Vite · Firebase · Flask · FastEmbed · FAISS · NumPy.
+
+- [semantic search/app.py](semantic%20search/app.py)
+- [src/services/semanticSearch.js](src/services/semanticSearch.js)
+- [src/services/content.service.js](src/services/content.service.js)
+
+## Development
+
+Run the repository checks after completing setup:
 
 ```bash
 npm run lint
 ```
 
-These commands are provided by the source configuration; this documentation update does not claim a fresh end-to-end application run.
+Use the offline checks during development. Run provider-backed integration checks separately with configured credentials and representative inputs.
 
-### Source Map
+## Contributing and support
 
-- [semantic search/app.py](semantic%20search/app.py)
-- [src/services/semanticSearch.js](src/services/semanticSearch.js)
-- [src/services/content.service.js](src/services/content.service.js)
+Report reproducible bugs or propose changes through [GitHub Issues](https://github.com/ryash14/adyes/issues). Include the relevant environment and a small example rather than private datasets or credentials. See [contributing](CONTRIBUTING.md), [security reporting](SECURITY.md) and the [code of conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+No repository-wide license is currently provided. Third-party components, models and datasets retain their own terms.
